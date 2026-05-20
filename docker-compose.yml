@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # FastAPI backend service
+  backend:
+    build:
+      context: ./fastapi_backend
+      dockerfile: Dockerfile
+    container_name: pixit_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist SQLite database and uploaded images across container restarts
+      - pixit_db_data:/app/data
+      - pixit_uploads:/app/uploads
+    environment:
+      - SQLALCHEMY_DATABASE_URL=sqlite:///./data/pixit.db
+      - ALLOWED_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000", "*"]
+    env_file:
+      - ./fastapi_backend/.env
+    networks:
+      - pixit_network
+
+  # Nginx-based React frontend service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Build-time argument to let the client browser know where the public backend is
+        - VITE_API_URL=http://localhost:8000
+    container_name: pixit_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - pixit_network
+
+# Named volumes for persisting data
+volumes:
+  pixit_db_data:
+  pixit_uploads:
+
+# Network configuration for container isolation and communication
+networks:
+  pixit_network:
+    driver: bridge

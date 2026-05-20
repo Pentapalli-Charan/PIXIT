@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins_local
+    restart: always
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      # Persistent Jenkins state volume
+      - jenkins_data:/var/jenkins_home
+      # Share host Docker socket for Docker-out-of-Docker (DooD) container management
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: root # Run as root locally to guarantee read/write access to /var/run/docker.sock without permission issues
+
+volumes:
+  jenkins_data:
