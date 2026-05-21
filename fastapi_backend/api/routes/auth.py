@@ -23,7 +23,7 @@ def register(user_in: UserRegister, db: Session = Depends(get_db)):
 
 @router.post("/login/", response_model=Token)
 def login(user_in: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == user_in.username).first()
+    user = db.query(User).filter((User.username == user_in.username) | (User.email == user_in.username)).first()
     if not user or not verify_password(user_in.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     

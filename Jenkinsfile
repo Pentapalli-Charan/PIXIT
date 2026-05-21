@@ -37,6 +37,8 @@ pipeline {
         stage('Build & Deploy Stack') {
             steps {
                 echo 'Building and launching Docker containers...'
+                // Ensure .env file exists in the cloned repository workspace for Docker Compose to read
+                sh 'if [ ! -f fastapi_backend/.env ]; then cp fastapi_backend/.env.example fastapi_backend/.env; fi'
                 // Build and start the containers using the standard docker-compose file in the repo root
                 sh 'docker compose -f docker-compose.yml down'
                 sh 'docker compose -f docker-compose.yml build --no-cache'
@@ -50,7 +52,8 @@ pipeline {
                 echo 'Verifying application health...'
                 // Wait for FastAPI backend container to start up and perform a health check curl
                 sh 'sleep 5'
-                sh 'curl -f http://backend:8000/health/ || curl -f http://localhost:8000/health/ || exit 1'
+                // Try host.docker.internal (for local Docker Desktop container-to-host bridging) first, then container name backend, then localhost
+                sh 'curl -f http://host.docker.internal:8000/health/ || curl -f http://backend:8000/health/ || curl -f http://localhost:8000/health/ || exit 1'
                 echo 'Sanity check passed! App is responsive.'
             }
         }
