@@ -4,6 +4,8 @@ pipeline {
     environment {
         // Force compose project name to keep CI containers isolated from development ones
         COMPOSE_PROJECT_NAME = "pixit_ci"
+        BACKEND_PORT = "8081"
+        FRONTEND_PORT = "3081"
     }
 
     stages {
@@ -52,8 +54,8 @@ pipeline {
                 echo 'Verifying application health...'
                 // Wait for FastAPI backend container to start up and perform a health check curl
                 sh 'sleep 5'
-                // Try host.docker.internal (for local Docker Desktop container-to-host bridging) first, then container name backend, then localhost
-                sh 'curl -f http://host.docker.internal:8000/health/ || curl -f http://backend:8000/health/ || curl -f http://localhost:8000/health/ || exit 1'
+                // Verify health check on the CI backend port (8081) mapped to host
+                sh 'curl -f http://host.docker.internal:${BACKEND_PORT}/health/ || curl -f http://localhost:${BACKEND_PORT}/health/ || exit 1'
                 echo 'Sanity check passed! App is responsive.'
             }
         }

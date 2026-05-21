@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     volumes:
       # Persist SQLite database and uploaded images across container restarts
       - pixit_db_data:/app/data
@@ -28,10 +28,10 @@ services:
       dockerfile: Dockerfile
       args:
         # Build-time argument to let the client browser know where the public backend is
-        - VITE_API_URL=http://localhost:8000
+        - VITE_API_URL=http://localhost:${BACKEND_PORT:-8000}
     restart: always
     ports:
-      - "3000:80"
+      - "${FRONTEND_PORT:-3000}:80"
     depends_on:
       - backend
     networks:
