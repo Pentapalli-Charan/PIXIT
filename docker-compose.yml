@@ -39,11 +39,11 @@ services:
 
   # Prometheus metrics collector
   prometheus:
-    image: prom/prometheus:v2.45.0
+    build:
+      context: ./prometheus
+      dockerfile: Dockerfile
     restart: always
     volumes:
-      # Mount the Prometheus config file from the host
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       # Persist scraped data across restarts
       - prometheus_data:/prometheus
     ports:
