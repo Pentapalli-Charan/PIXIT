@@ -6,7 +6,6 @@ services:
     build:
       context: ./fastapi_backend
       dockerfile: Dockerfile
-    container_name: pixit_backend
     restart: always
     ports:
       - "8000:8000"
@@ -30,7 +29,6 @@ services:
       args:
         # Build-time argument to let the client browser know where the public backend is
         - VITE_API_URL=http://localhost:8000
-    container_name: pixit_frontend
     restart: always
     ports:
       - "3000:80"
