@@ -37,10 +37,81 @@ services:
     networks:
       - pixit_network
 
+  # Prometheus metrics collector
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    restart: always
+    volumes:
+      # Mount the Prometheus config file from the host
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      # Persist scraped data across restarts
+      - prometheus_data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    depends_on:
+      - backend
+    networks:
+      - pixit_network
+
+  # Grafana dashboard visualization
+  grafana:
+    image: grafana/grafana:10.0.3
+    restart: always
+    volumes:
+      # Persist Grafana dashboards, plugins, and settings
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    environment:
+      # Set default admin credentials for quick access (change in production)
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - pixit_network
+
+  # Node Exporter collects system-level hardware and OS metrics
+  node-exporter:
+    image: prom/node-exporter:v1.6.1
+    restart: always
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      # Prevent exporting filesystems that aren't physical disks
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "${NODE_EXPORTER_PORT:-9100}:9100"
+    networks:
+      - pixit_network
+
+  # cAdvisor collects resource usage and performance metrics of running containers
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    restart: always
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    ports:
+      - "${CADVISOR_PORT:-8082}:8080"
+    networks:
+      - pixit_network
+
 # Named volumes for persisting data
 volumes:
   pixit_db_data:
   pixit_uploads:
+  prometheus_data:
+  grafana_data:
 
 # Network configuration for container isolation and communication
 networks:

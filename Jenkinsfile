@@ -6,6 +6,10 @@ pipeline {
         COMPOSE_PROJECT_NAME = "pixit_ci"
         BACKEND_PORT = "8081"
         FRONTEND_PORT = "3081"
+        PROMETHEUS_PORT = "9091"
+        GRAFANA_PORT = "3002"
+        NODE_EXPORTER_PORT = "9101"
+        CADVISOR_PORT = "8083"
     }
 
     stages {

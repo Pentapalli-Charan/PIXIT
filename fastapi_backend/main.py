@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from api.routes import auth, upload, health
 
@@ -30,3 +31,7 @@ app.mount("/static", StaticFiles(directory="uploads"), name="static")
 app.include_router(health.router, prefix="/health", tags=["health"])
 app.include_router(auth.router, tags=["auth"])
 app.include_router(upload.router, prefix="/upload", tags=["upload"])
+
+# Instrument with Prometheus metrics
+Instrumentator().instrument(app).expose(app)
+

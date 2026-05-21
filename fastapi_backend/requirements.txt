@@ -7,3 +7,4 @@ sqlalchemy
 pydantic
 pydantic-settings
 email-validator
+prometheus-fastapi-instrumentator
