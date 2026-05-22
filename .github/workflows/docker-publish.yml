@@ -89,3 +89,11 @@ jobs:
             VITE_API_URL=${{ secrets.VITE_API_URL || 'http://localhost:8000' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Trigger Backend Redeploy
+        run: |
+          curl -f -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}"
+
+      - name: Trigger Frontend Redeploy
+        run: |
+          curl -f -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}"
