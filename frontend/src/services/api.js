@@ -5,8 +5,14 @@ if (API_URL && !API_URL.startsWith('http://') && !API_URL.startsWith('https://')
   API_URL = `https://${API_URL}`;
 }
 
+// Clean trailing slash to avoid double-slash requests
+if (API_URL.endsWith('/')) {
+  API_URL = API_URL.slice(0, -1);
+}
+
 async function request(endpoint, options = {}) {
   const url = `${API_URL}${endpoint}`;
+
   
   // Set default headers
   const headers = { ...options.headers };

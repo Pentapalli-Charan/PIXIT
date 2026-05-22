@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -22,20 +23,30 @@ app = FastAPI(
     description="Production-ready FastAPI backend for PIXIT standardized on PostgreSQL"
 )
 
-# CORS Configuration
-# Spec: Access-Control-Allow-Origin cannot be "*" when Access-Control-Allow-Credentials is true.
-# We must filter out "*" and declare explicit allowed origins.
+# Robust CORS Configuration to handle env string representations and lists cleanly
+raw_origins = os.environ.get("ALLOWED_ORIGINS") or settings.ALLOWED_ORIGINS
 origins = []
-for origin in settings.ALLOWED_ORIGINS:
-    # If the setting was read as a string representation of a list, clean it up
-    cleaned = origin.strip("[]'\" ")
-    if cleaned == "*":
-        continue
-    if cleaned:
-        origins.append(cleaned)
 
-# Fallbacks for standard local development ports
+if isinstance(raw_origins, str):
+    raw_origins = raw_origins.strip()
+    if raw_origins.startswith("[") and raw_origins.endswith("]"):
+        try:
+            origins = json.loads(raw_origins)
+        except Exception:
+            # Fallback for single-quoted or unparsable arrays
+            origins = [o.strip(" '\"") for o in raw_origins[1:-1].split(",") if o.strip()]
+    else:
+        # Check if comma-separated
+        origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
+elif isinstance(raw_origins, list):
+    origins = list(raw_origins)
+
+# Exclude wildcard from origins if credentials are required
+origins = [o for o in origins if o != "*"]
+
+# Guarantee production and local development origins are whitelisted
 fallback_origins = [
+    "https://pixit-frontend.onrender.com",
     "http://localhost:5173", 
     "http://127.0.0.1:5173", 
     "http://localhost:3000", 
