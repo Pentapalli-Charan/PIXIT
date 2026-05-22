@@ -1,4 +1,9 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+let API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+// If Render provides the host name only (via property: host), prepend https://
+if (API_URL && !API_URL.startsWith('http://') && !API_URL.startsWith('https://')) {
+  API_URL = `https://${API_URL}`;
+}
 
 async function request(endpoint, options = {}) {
   const url = `${API_URL}${endpoint}`;

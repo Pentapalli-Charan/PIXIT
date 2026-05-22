@@ -28,7 +28,7 @@ services:
         fromService:
           type: web
           name: pixit-backend
-          property: url
+          property: host
 
 databases:
   # Managed PostgreSQL Database
