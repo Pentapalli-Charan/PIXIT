@@ -18,10 +18,11 @@ services:
         generateValue: true
 
   # React Frontend Static Site
-  - type: static
+  - type: web
     name: pixit-frontend
+    runtime: static
     buildCommand: npm run build
-    publishPath: dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         fromService:
