@@ -12,3 +12,10 @@ class UserRegister(BaseModel):
 class Token(BaseModel):
     access: str
     token_type: str = "bearer"
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str

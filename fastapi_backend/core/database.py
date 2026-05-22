@@ -1,24 +1,39 @@
+import logging
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, Boolean, JSON
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sqlalchemy.sql import func
 from core.config import settings
 
-connect_args = {"check_same_thread": False} if settings.SQLALCHEMY_DATABASE_URL.startswith("sqlite") else {}
+logger = logging.getLogger("pixit.database")
 
+# Enforce PostgreSQL Only
+db_url = settings.SQLALCHEMY_DATABASE_URL
+if not db_url or not (db_url.startswith("postgresql") or db_url.startswith("postgres")):
+    logger.critical("SQLite or invalid database URL detected. PIXIT is configured to run on PostgreSQL only.")
+    raise ValueError("Invalid Database URL: Only PostgreSQL is supported in this deployment.")
+
+# Standard PostgreSQL engine configuration
 engine = create_engine(
-    settings.SQLALCHEMY_DATABASE_URL, connect_args=connect_args
+    db_url,
+    pool_size=10,
+    max_overflow=20,
+    pool_pre_ping=True
 )
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
+    username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Forgot password reset fields
+    reset_token = Column(String, nullable=True, index=True)
+    reset_token_expires = Column(DateTime(timezone=True), nullable=True)
 
     projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
 
@@ -46,8 +61,12 @@ class Stylization(Base):
 
     project = relationship("Project", back_populates="stylizations")
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+# Create tables automatically at import
+try:
+    Base.metadata.create_all(bind=engine)
+    logger.info("PostgreSQL database tables initialized successfully.")
+except Exception as e:
+    logger.critical(f"Failed to initialize PostgreSQL tables: {e}")
 
 def get_db():
     db = SessionLocal()
@@ -55,3 +74,17 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# Startup Database connection validation helper
+def verify_db_connection():
+    try:
+        with engine.connect() as conn:
+            from sqlalchemy import text
+            conn.execute(text("SELECT 1"))
+            logger.info("Successfully established connection to Render PostgreSQL Database.")
+            print("Successfully established connection to Render PostgreSQL Database.")
+            return True
+    except Exception as e:
+        logger.critical(f"Failed to connect to PostgreSQL Database: {e}")
+        print(f"DATABASE CONNECTION FAILURE: {e}")
+        return False
