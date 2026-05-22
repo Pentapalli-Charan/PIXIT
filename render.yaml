@@ -3,6 +3,7 @@ services:
   - type: web
     name: pixit-backend
     runtime: docker
+    plan: free
     dockerContext: ./fastapi_backend
     dockerfilePath: ./fastapi_backend/Dockerfile
     envVars:
@@ -21,6 +22,7 @@ services:
   - type: web
     name: pixit-frontend
     runtime: static
+    plan: free
     buildCommand: npm run build
     staticPublishPath: dist
     envVars:
