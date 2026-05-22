@@ -13,7 +13,7 @@ logger = logging.getLogger("pixit.auth")
 
 @router.post("/register/", response_model=dict)
 def register(user_in: UserRegister, db: Session = Depends(get_db)):
-    logger.info(f"Registration request received for username: {user_in.username}")
+    logger.info(f"[DEBUG AUTH] Registration request received for username: {user_in.username}")
     
     # Check if username or email already exists
     existing_user = db.query(User).filter(
@@ -21,7 +21,7 @@ def register(user_in: UserRegister, db: Session = Depends(get_db)):
     ).first()
     
     if existing_user:
-        logger.warning(f"Registration failed: Username or email already registered for: {user_in.username} / {user_in.email}")
+        logger.warning(f"[DEBUG AUTH] Registration failed: Username or email already registered: {user_in.username} / {user_in.email}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail="Username or email is already registered."
@@ -29,6 +29,8 @@ def register(user_in: UserRegister, db: Session = Depends(get_db)):
     
     try:
         hashed_password = get_password_hash(user_in.password)
+        logger.info(f"[DEBUG AUTH] Generated hash length for registration: {len(hashed_password)}, preview: {hashed_password[:15]}...")
+        
         db_user = User(
             username=user_in.username, 
             email=user_in.email, 
@@ -37,11 +39,11 @@ def register(user_in: UserRegister, db: Session = Depends(get_db)):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        logger.info(f"User registration completed successfully: {user_in.username}")
+        logger.info(f"[DEBUG AUTH] User registration completed successfully: {user_in.username}")
         return {"message": "User registered successfully."}
     except Exception as e:
         db.rollback()
-        logger.error(f"Registration database error: {e}")
+        logger.error(f"[DEBUG AUTH] Registration database error: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database transaction error during registration."
@@ -49,14 +51,27 @@ def register(user_in: UserRegister, db: Session = Depends(get_db)):
 
 @router.post("/login/", response_model=Token)
 def login(user_in: UserLogin, db: Session = Depends(get_db)):
-    logger.info(f"Login request received for identifier: {user_in.username}")
+    logger.info(f"[DEBUG AUTH] Login request received. Identifier: {user_in.username}")
     
     user = db.query(User).filter(
         (User.username == user_in.username) | (User.email == user_in.username)
     ).first()
     
-    if not user or not verify_password(user_in.password, user.hashed_password):
-        logger.warning(f"Failed login attempt for: {user_in.username}")
+    if not user:
+        logger.warning(f"[DEBUG AUTH] User lookup failed. No user found for: {user_in.username}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Incorrect username, email, or password."
+        )
+        
+    logger.info(f"[DEBUG AUTH] User found: id={user.id}, username={user.username}, email={user.email}")
+    logger.info(f"[DEBUG AUTH] Stored hash preview: {user.hashed_password[:15]}... (length={len(user.hashed_password)})")
+    
+    verified = verify_password(user_in.password, user.hashed_password)
+    logger.info(f"[DEBUG AUTH] Password verification result: {verified}")
+    
+    if not verified:
+        logger.warning(f"[DEBUG AUTH] Password verification failed for: {user.username}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
             detail="Incorrect username, email, or password."
@@ -67,10 +82,10 @@ def login(user_in: UserLogin, db: Session = Depends(get_db)):
         access_token = create_access_token(
             data={"sub": user.username}, expires_delta=access_token_expires
         )
-        logger.info(f"Successful login for user: {user.username}")
+        logger.info(f"[DEBUG AUTH] JWT token created successfully for user: {user.username}")
         return {"access": access_token, "token_type": "bearer"}
     except Exception as e:
-        logger.error(f"Token generation failure: {e}")
+        logger.error(f"[DEBUG AUTH] JWT token creation failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate secure auth session."
@@ -82,14 +97,11 @@ def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db
     
     user = db.query(User).filter(User.email == payload.email).first()
     
-    # Secure design: To prevent email enumeration, we return the same message
-    # even if the email does not exist in the database.
     if not user:
         logger.info(f"Password reset skipped: Email '{payload.email}' not found (silent response).")
         return {"message": "If your email is registered, a password reset token has been sent."}
     
     try:
-        # Generate secure reset token
         token = secrets.token_hex(16)
         expiration = datetime.now(timezone.utc) + timedelta(hours=1)
         
@@ -97,7 +109,6 @@ def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db
         user.reset_token_expires = expiration
         db.commit()
         
-        # Simulating email dispatch
         logger.info(f"\n======================================================\n"
                     f"SIMULATED EMAIL DISPATCH FOR PASSWORD RESET\n"
                     f"To: {user.email}\n"
@@ -120,7 +131,6 @@ def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db
 def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db)):
     logger.info("Executing password reset confirmation.")
     
-    # Locate user with active token
     user = db.query(User).filter(User.reset_token == payload.token).first()
     
     if not user:
@@ -130,16 +140,13 @@ def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db))
             detail="Invalid or expired password reset token."
         )
     
-    # Verify expiration
     now = datetime.now(timezone.utc)
-    # Ensure reset_token_expires is timezone-aware to match now
     expires = user.reset_token_expires
     if expires.tzinfo is None:
         expires = expires.replace(tzinfo=timezone.utc)
         
     if now > expires:
         logger.warning(f"Password reset failed: Token has expired for user: {user.username}")
-        # Clear expired token
         user.reset_token = None
         user.reset_token_expires = None
         db.commit()
@@ -149,7 +156,6 @@ def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db))
         )
     
     try:
-        # Save new hashed password and clear token columns
         user.hashed_password = get_password_hash(payload.new_password)
         user.reset_token = None
         user.reset_token_expires = None
