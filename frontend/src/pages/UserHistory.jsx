@@ -89,14 +89,14 @@ const UserHistory = () => {
       {/* Title */}
       <div className="mb-10">
         <h1 className="text-3xl font-black flex items-center gap-2">
-          <History className="text-[#B0FF00] w-7 h-7" /> SAVED PROJECT LIBRARY
+          <History className="text-[var(--pixit-primary)] w-7 h-7" /> SAVED PROJECT LIBRARY
         </h1>
         <p className="text-gray-500 text-xs mt-1">Review, export, delete, or re-stylize your processed designs.</p>
       </div>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="w-10 h-10 border-4 border-[#B0FF00]/20 border-t-[#B0FF00] rounded-full animate-spin mb-4"></div>
+          <div className="w-10 h-10 border-4 border-[var(--pixit-primary)]/20 border-t-[var(--pixit-primary)] rounded-full animate-spin mb-4"></div>
           <span className="text-gray-500 text-xs font-bold uppercase tracking-widest">Loading Library...</span>
         </div>
       ) : error ? (
@@ -109,7 +109,7 @@ const UserHistory = () => {
           <p className="text-gray-600 text-xs mb-6 max-w-xs mx-auto">Stylize your first photo to see it saved here automatically.</p>
           <button 
             onClick={() => navigate('/workspace')}
-            className="bg-[#B0FF00] text-black font-extrabold text-xs uppercase px-5 py-2.5 rounded-xl cursor-pointer"
+            className="bg-[var(--pixit-primary)] text-black font-extrabold text-xs uppercase px-5 py-2.5 rounded-xl cursor-pointer"
           >
             Launch Neural Editor
           </button>
@@ -177,7 +177,7 @@ const UserHistory = () => {
                               disabled={visibilityLoadingId === sty.id}
                               className={`p-2 rounded-lg border transition cursor-pointer ${
                                 sty.is_public
-                                  ? 'bg-[#B0FF00]/10 border-[#B0FF00]/20 text-[#B0FF00]'
+                                  ? 'bg-[var(--pixit-primary)]/10 border-[var(--pixit-primary)]/20 text-[var(--pixit-primary)]'
                                   : 'bg-black/25 border-white/5 text-gray-500 hover:text-white'
                               }`}
                               title={sty.is_public ? "Publicly Shared" : "Private image"}
@@ -201,7 +201,7 @@ const UserHistory = () => {
                             <button
                               type="button"
                               onClick={() => handleEditAgain(proj, sty.style_applied)}
-                              className="p-2 rounded-lg bg-[#B0FF00] text-black hover:shadow-[0_0_8px_rgba(176,255,0,0.3)] transition cursor-pointer"
+                              className="p-2 rounded-lg bg-[var(--pixit-primary)] text-black hover:shadow-[0_0_8px_rgba(182,255,0,0.3)] transition cursor-pointer"
                               title="Open in editor with original image"
                             >
                               <ExternalLink className="w-4 h-4" />
@@ -219,7 +219,7 @@ const UserHistory = () => {
                   <button 
                     type="button"
                     onClick={() => handleEditAgain(proj, 'cartoon')}
-                    className="text-xs text-[#B0FF00] hover:text-[#B0FF00]/80 font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer bg-transparent border-none"
+                    className="text-xs text-[var(--pixit-primary)] hover:text-[var(--pixit-primary)]/80 font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer bg-transparent border-none"
                   >
                     Apply New Filter <Sparkles className="w-3.5 h-3.5" />
                   </button>

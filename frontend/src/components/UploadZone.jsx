@@ -36,12 +36,12 @@ const UploadZone = ({ onUploadClick, onFileSelect }) => {
       onClick={onUploadClick}
       className={`border-2 border-dashed rounded-3xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-300 h-[340px] select-none ${
         isDragActive 
-          ? 'bg-[#B0FF00]/5 border-[#B0FF00] shadow-[0_0_20px_rgba(176,255,0,0.15)] scale-[0.99]' 
-          : 'bg-[#111115]/80 border-slate-800 hover:border-[#B0FF00]/50 hover:bg-[#15151a]'
+          ? 'bg-[var(--pixit-primary)]/5 border-[var(--pixit-primary)] shadow-[0_0_20px_rgba(182,255,0,0.15)] scale-[0.99]' 
+          : 'bg-[#111115]/80 border-slate-800 hover:border-[var(--pixit-primary)]/50 hover:bg-[#15151a]'
       }`}
     >
       <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 ${
-        isDragActive ? 'scale-110 bg-[#B0FF00]/20 text-[#B0FF00]' : 'bg-slate-900 text-gray-400'
+        isDragActive ? 'scale-110 bg-[var(--pixit-primary)]/20 text-[var(--pixit-primary)]' : 'bg-slate-900 text-gray-400'
       }`}>
         <Upload className="w-7 h-7" />
       </div>
@@ -52,7 +52,7 @@ const UploadZone = ({ onUploadClick, onFileSelect }) => {
       </p>
       <button 
         type="button"
-        className="bg-[#B0FF00] text-black px-6 py-2.5 rounded-xl font-black hover:shadow-[0_4px_15px_rgba(176,255,0,0.3)] transition pointer-events-none"
+        className="bg-[var(--pixit-primary)] text-black px-6 py-2.5 rounded-xl font-black hover:shadow-[0_4px_15px_rgba(182,255,0,0.3)] transition pointer-events-none"
       >
         Select Image
       </button>

@@ -7,7 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        'neon-green': '#B0FF00',
+        'pixit-primary': 'var(--pixit-primary)',
+        'neon-green': 'var(--pixit-primary)',
         'bg-dark': '#000000',
         'card-dark': '#0B0B0B',
         'border-dark': '#1F1F1F',

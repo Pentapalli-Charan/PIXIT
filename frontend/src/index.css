@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+:root {
+  --pixit-primary: #B6FF00;
+}
+
 @layer base {
   body {
     @apply bg-black text-white font-sans antialiased;

@@ -148,7 +148,7 @@ const Workspace = () => {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-black flex items-center gap-2">
-            <Sparkles className="text-[#B0FF00] w-7 h-7" /> PIXIT NEURAL EDITOR
+            <Sparkles className="text-[var(--pixit-primary)] w-7 h-7" /> PIXIT NEURAL EDITOR
           </h1>
           <p className="text-gray-500 text-xs mt-1">Enhance and stylize your images in seconds using OpenCV.</p>
         </div>
@@ -182,8 +182,8 @@ const Workspace = () => {
               <div className="bg-[#111115]/80 border border-slate-800 rounded-3xl p-4 flex items-center justify-center min-h-[300px] max-h-[500px] overflow-hidden relative shadow-2xl">
                 {isProcessing && (
                   <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center z-20 backdrop-blur-sm">
-                    <div className="w-14 h-14 border-4 border-[#B0FF00]/30 border-t-[#B0FF00] rounded-full animate-spin mb-4"></div>
-                    <span className="text-[#B0FF00] font-black text-sm uppercase tracking-widest animate-pulse">
+                    <div className="w-14 h-14 border-4 border-[var(--pixit-primary)]/30 border-t-[var(--pixit-primary)] rounded-full animate-spin mb-4"></div>
+                    <span className="text-[var(--pixit-primary)] font-black text-sm uppercase tracking-widest animate-pulse">
                       Processing AI Canvas
                     </span>
                     <span className="text-gray-500 text-xs mt-1">Applying OpenCV matrix transformations...</span>
@@ -214,7 +214,7 @@ const Workspace = () => {
               )}
               
               {successMsg && (
-                <div className="mt-4 flex items-center gap-3 bg-[#B0FF00]/10 border border-[#B0FF00]/30 text-[#B0FF00] text-sm p-4 rounded-2xl">
+                <div className="mt-4 flex items-center gap-3 bg-[var(--pixit-primary)]/10 border border-[var(--pixit-primary)]/30 text-[var(--pixit-primary)] text-sm p-4 rounded-2xl">
                   <Check className="w-5 h-5 flex-shrink-0" />
                   <span className="font-extrabold">{successMsg}</span>
                 </div>
@@ -226,7 +226,7 @@ const Workspace = () => {
         {/* Right Side: Options & Configurations (5 cols) */}
         <div className="lg:col-span-5 bg-[#111115]/80 border border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col gap-6">
           <h2 className="text-lg font-black pb-4 border-b border-white/5 flex items-center gap-2">
-            <Sliders className="w-5 h-5 text-[#B0FF00]" /> Filter Adjustment Panel
+            <Sliders className="w-5 h-5 text-[var(--pixit-primary)]" /> Filter Adjustment Panel
           </h2>
 
           <StyleSelector style={style} setStyle={setStyle} isProcessing={isProcessing} />
@@ -239,7 +239,7 @@ const Workspace = () => {
             <div>
               <div className="flex justify-between items-center text-xs font-bold mb-2">
                 <span className="text-gray-300">Filter Intensity</span>
-                <span className="text-[#B0FF00] font-black">{(intensity * 100).toFixed(0)}%</span>
+                <span className="text-[var(--pixit-primary)] font-black">{(intensity * 100).toFixed(0)}%</span>
               </div>
               <input 
                 type="range"
@@ -249,7 +249,7 @@ const Workspace = () => {
                 value={intensity}
                 onChange={(e) => setIntensity(parseFloat(e.target.value))}
                 disabled={isProcessing || style === "background_removal"}
-                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#B0FF00] disabled:opacity-30"
+                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[var(--pixit-primary)] disabled:opacity-30"
               />
               <span className="text-[10px] text-gray-500 mt-1 block">Controls bilateral iterations or blur radii.</span>
             </div>
@@ -258,7 +258,7 @@ const Workspace = () => {
             <div>
               <div className="flex justify-between items-center text-xs font-bold mb-2">
                 <span className="text-gray-300">Contrast Multiplier</span>
-                <span className="text-[#B0FF00] font-black">{contrast.toFixed(1)}x</span>
+                <span className="text-[var(--pixit-primary)] font-black">{contrast.toFixed(1)}x</span>
               </div>
               <input 
                 type="range"
@@ -268,7 +268,7 @@ const Workspace = () => {
                 value={contrast}
                 onChange={(e) => setContrast(parseFloat(e.target.value))}
                 disabled={isProcessing}
-                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#B0FF00]"
+                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[var(--pixit-primary)]"
               />
             </div>
 
@@ -276,7 +276,7 @@ const Workspace = () => {
             <div>
               <div className="flex justify-between items-center text-xs font-bold mb-2">
                 <span className="text-gray-300">Brightness Bias</span>
-                <span className="text-[#B0FF00] font-black">{brightness > 0 ? `+${brightness}` : brightness}</span>
+                <span className="text-[var(--pixit-primary)] font-black">{brightness > 0 ? `+${brightness}` : brightness}</span>
               </div>
               <input 
                 type="range"
@@ -286,7 +286,7 @@ const Workspace = () => {
                 value={brightness}
                 onChange={(e) => setBrightness(parseInt(e.target.value))}
                 disabled={isProcessing}
-                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#B0FF00]"
+                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[var(--pixit-primary)]"
               />
             </div>
           </div>
@@ -298,7 +298,7 @@ const Workspace = () => {
                 type="button"
                 onClick={handleProcessImage}
                 disabled={isProcessing || !previewUrl}
-                className="w-full bg-[#B0FF00] text-black font-black py-4.5 rounded-2xl hover:shadow-[0_4px_25px_rgba(176,255,0,0.3)] transition duration-200 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full bg-[var(--pixit-primary)] text-black font-black py-4.5 rounded-2xl hover:shadow-[0_4px_25px_rgba(182,255,0,0.3)] transition duration-200 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2 cursor-pointer"
               >
                 APPLY RENDER STYLIZATION
               </button>
@@ -310,7 +310,7 @@ const Workspace = () => {
                     download={`pixit_artwork_${style}.png`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 bg-[#B0FF00] text-black font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:shadow-[0_4px_20px_rgba(176,255,0,0.3)] transition cursor-pointer text-center text-sm"
+                    className="flex-1 bg-[var(--pixit-primary)] text-black font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:shadow-[0_4px_20px_rgba(182,255,0,0.3)] transition cursor-pointer text-center text-sm"
                   >
                     <Download className="w-4 h-4" /> Download HD
                   </a>

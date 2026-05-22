@@ -121,14 +121,14 @@ const AuthModal = () => {
         <div className="flex border-b border-gray-800 mb-6">
           <button 
             type="button"
-            className={`flex-1 py-2 font-bold text-sm uppercase transition ${mode === 'login' ? 'text-white border-b-2 border-[#B0FF00]' : 'text-gray-500 hover:text-gray-300'}`}
+            className={`flex-1 py-2 font-bold text-sm uppercase transition ${mode === 'login' ? 'text-white border-b-2 border-[var(--pixit-primary)]' : 'text-gray-500 hover:text-gray-300'}`}
             onClick={() => handleModeSwitch('login')}
           >
             Login
           </button>
           <button 
             type="button"
-            className={`flex-1 py-2 font-bold text-sm uppercase transition ${mode === 'register' ? 'text-white border-b-2 border-[#B0FF00]' : 'text-gray-500 hover:text-gray-300'}`}
+            className={`flex-1 py-2 font-bold text-sm uppercase transition ${mode === 'register' ? 'text-white border-b-2 border-[var(--pixit-primary)]' : 'text-gray-500 hover:text-gray-300'}`}
             onClick={() => handleModeSwitch('register')}
           >
             Register
@@ -149,7 +149,7 @@ const AuthModal = () => {
                   onChange={handleChange} 
                   disabled={isLoading}
                   autoFocus
-                  className="w-full bg-black/40 border border-gray-700 rounded-lg p-3 text-white focus:border-[#B0FF00] focus:ring-1 focus:ring-[#B0FF00] outline-none transition" 
+                  className="w-full bg-black/40 border border-gray-700 rounded-lg p-3 text-white focus:border-[var(--pixit-primary)] focus:ring-1 focus:ring-[var(--pixit-primary)] outline-none transition" 
                   required 
                 />
               </div>
@@ -161,7 +161,7 @@ const AuthModal = () => {
                   value={formData.email} 
                   onChange={handleChange} 
                   disabled={isLoading}
-                  className="w-full bg-black/40 border border-gray-700 rounded-lg p-3 text-white focus:border-[#B0FF00] focus:ring-1 focus:ring-[#B0FF00] outline-none transition" 
+                  className="w-full bg-black/40 border border-gray-700 rounded-lg p-3 text-white focus:border-[var(--pixit-primary)] focus:ring-1 focus:ring-[var(--pixit-primary)] outline-none transition" 
                   required 
                 />
               </div>
@@ -178,7 +178,7 @@ const AuthModal = () => {
                 onChange={handleChange} 
                 disabled={isLoading}
                 autoFocus
-                className="w-full bg-black/40 border border-gray-700 rounded-lg p-3 text-white focus:border-[#B0FF00] focus:ring-1 focus:ring-[#B0FF00] outline-none transition" 
+                className="w-full bg-black/40 border border-gray-700 rounded-lg p-3 text-white focus:border-[var(--pixit-primary)] focus:ring-1 focus:ring-[var(--pixit-primary)] outline-none transition" 
                 required 
               />
             </div>
@@ -192,7 +192,7 @@ const AuthModal = () => {
               value={formData.password} 
               onChange={handleChange} 
               disabled={isLoading}
-              className="w-full bg-black/40 border border-gray-700 rounded-lg p-3 text-white focus:border-[#B0FF00] focus:ring-1 focus:ring-[#B0FF00] outline-none transition" 
+              className="w-full bg-black/40 border border-gray-700 rounded-lg p-3 text-white focus:border-[var(--pixit-primary)] focus:ring-1 focus:ring-[var(--pixit-primary)] outline-none transition" 
               required 
             />
           </div>
@@ -200,7 +200,7 @@ const AuthModal = () => {
           <button 
             type="submit" 
             disabled={isLoading}
-            className="mt-4 w-full bg-[#B0FF00] text-black font-bold py-3 rounded-lg hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(176,255,0,0.4)] transition disabled:opacity-50 disabled:transform-none"
+            className="mt-4 w-full bg-[var(--pixit-primary)] text-black font-bold py-3 rounded-lg hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(182,255,0,0.4)] transition disabled:opacity-50 disabled:transform-none"
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">

@@ -68,7 +68,7 @@ const Home = () => {
       {/* Right Column / Image Upload Area */}
       <div className="flex-1 flex justify-center items-center w-full max-w-lg relative">
         <div className="w-full bg-[#111] border border-gray-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#B0FF00]/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--pixit-primary)]/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
           
           <input 
             type="file" 
@@ -98,7 +98,7 @@ const Home = () => {
         </div>
         
         {/* Floating decoration elements */}
-        <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#B0FF00]/20 rounded-full blur-xl pointer-events-none z-[-1]"></div>
+        <div className="absolute -top-6 -right-6 w-24 h-24 bg-[var(--pixit-primary)]/20 rounded-full blur-xl pointer-events-none z-[-1]"></div>
         <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-orange-600/20 rounded-full blur-xl pointer-events-none z-[-1]"></div>
       </div>
 

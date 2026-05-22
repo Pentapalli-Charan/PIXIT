@@ -16,7 +16,7 @@ const Navbar = () => {
   const linkClass = ({ isActive }) => 
     `text-sm font-bold transition flex items-center gap-2 px-3 py-1.5 rounded-lg select-none ${
       isActive 
-        ? 'text-[#B0FF00] bg-white/5' 
+        ? 'text-[var(--pixit-primary)] bg-white/5' 
         : 'text-gray-400 hover:text-white hover:bg-white/5'
     }`;
 
@@ -28,9 +28,9 @@ const Navbar = () => {
         <Link to="/" className="flex items-center gap-2 select-none cursor-pointer">
           <svg width="74" height="28" viewBox="0 0 105 40" style={{ verticalAlign: 'middle' }}>
               <text x="0" y="32" fontFamily="'Inter', sans-serif" fontWeight="900" fontSize="34" letterSpacing="-3">
-                  <tspan fill="#B0FF00">PIX</tspan><tspan fill="#FFFFFF">IT</tspan>
+                  <tspan fill="var(--pixit-primary)">PIX</tspan><tspan fill="#FFFFFF">IT</tspan>
               </text>
-              <circle cx="86" cy="30" r="5" fill="#B0FF00"/>
+              <circle cx="86" cy="30" r="5" fill="var(--pixit-primary)"/>
           </svg>
         </Link>
 
@@ -60,7 +60,7 @@ const Navbar = () => {
                 to="/profile"
                 className="bg-transparent text-gray-400 font-bold px-3 py-2 hover:text-white transition flex items-center gap-2 cursor-pointer text-sm"
               >
-                <UserIcon className="w-4 h-4 text-[#B0FF00]" /> {user.username}
+                <UserIcon className="w-4 h-4 text-[var(--pixit-primary)]" /> {user.username}
               </Link>
               <button 
                 type="button"

@@ -16,7 +16,7 @@ const ImagePreview = ({
       <div className="relative w-full h-[300px] rounded-2xl overflow-hidden border border-gray-700 bg-black/40 mb-4">
         {isProcessing && (
           <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center z-10 backdrop-blur-sm">
-            <div className="w-12 h-12 border-4 border-[#B0FF00]/30 border-t-[#B0FF00] rounded-full animate-spin mb-4"></div>
+            <div className="w-12 h-12 border-4 border-[var(--pixit-primary)]/30 border-t-[var(--pixit-primary)] rounded-full animate-spin mb-4"></div>
             <span className="text-white font-bold animate-pulse">Running Neural Engine...</span>
           </div>
         )}
@@ -26,7 +26,7 @@ const ImagePreview = ({
           className="w-full h-full object-contain"
         />
         {processedUrl && (
-          <div className="absolute top-3 right-3 bg-[#B0FF00] text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+          <div className="absolute top-3 right-3 bg-[var(--pixit-primary)] text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">
             ✨ AI Styled
           </div>
         )}
@@ -69,7 +69,7 @@ const ImagePreview = ({
             href={processedUrl}
             download="pixit_ai_artwork.jpg"
             target="_blank"
-            className="flex-2 flex justify-center items-center bg-[#B0FF00] text-black py-3 px-6 rounded-lg font-bold hover:shadow-[0_4px_15px_rgba(176,255,0,0.4)] transition text-center"
+            className="flex-2 flex justify-center items-center bg-[var(--pixit-primary)] text-black py-3 px-6 rounded-lg font-bold hover:shadow-[0_4px_15px_rgba(182,255,0,0.4)] transition text-center"
           >
             Download Output
           </a>

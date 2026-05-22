@@ -25,11 +25,11 @@ const StyleSelector = ({ style, setStyle, isProcessing }) => {
             disabled={isProcessing}
             className={`flex flex-col text-left p-3.5 rounded-xl border transition cursor-pointer select-none ${
               style === s.id 
-                ? 'bg-[#B0FF00]/10 border-[#B0FF00] shadow-[0_0_15px_rgba(176,255,0,0.1)]' 
-                : 'bg-black/40 border-white/10 hover:border-[#B0FF00]/40 text-gray-300 hover:text-white'
+                ? 'bg-[var(--pixit-primary)]/10 border-[var(--pixit-primary)] shadow-[0_0_15px_rgba(182,255,0,0.1)]' 
+                : 'bg-black/40 border-white/10 hover:border-[var(--pixit-primary)]/40 text-gray-300 hover:text-white'
             }`}
           >
-            <span className={`font-bold text-sm mb-1 ${style === s.id ? 'text-[#B0FF00]' : ''}`}>
+            <span className={`font-bold text-sm mb-1 ${style === s.id ? 'text-[var(--pixit-primary)]' : ''}`}>
               {s.label}
             </span>
             <span className="text-[11px] text-gray-500 line-clamp-1 leading-normal">

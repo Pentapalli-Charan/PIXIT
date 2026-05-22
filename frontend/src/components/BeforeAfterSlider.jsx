@@ -80,11 +80,11 @@ const BeforeAfterSlider = ({ beforeImage, afterImage, height = "h-[450px]" }) =>
 
       {/* Slider Line Divider */}
       <div 
-        className="absolute top-0 bottom-0 w-1 bg-[#B0FF00] shadow-[0_0_10px_#B0FF00] pointer-events-none"
+        className="absolute top-0 bottom-0 w-1 bg-[var(--pixit-primary)] shadow-[0_0_10px_var(--pixit-primary)] pointer-events-none"
         style={{ left: `${sliderPosition}%` }}
       >
         {/* Slider Handle Knob */}
-        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 bg-[#B0FF00] text-black border-4 border-black rounded-full flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 pointer-events-none">
+        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 bg-[var(--pixit-primary)] text-black border-4 border-black rounded-full flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 pointer-events-none">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 18 15 12 9 6"></polyline>
             <polyline points="15 18 9 12 15 6"></polyline>
@@ -96,7 +96,7 @@ const BeforeAfterSlider = ({ beforeImage, afterImage, height = "h-[450px]" }) =>
       <span className="absolute bottom-4 left-4 bg-black/60 text-white font-bold text-xs px-3 py-1.5 rounded-full border border-white/10 pointer-events-none">
         Original
       </span>
-      <span className="absolute bottom-4 right-4 bg-[#B0FF00]/80 text-black font-extrabold text-xs px-3 py-1.5 rounded-full border border-[#B0FF00]/10 pointer-events-none">
+      <span className="absolute bottom-4 right-4 bg-[var(--pixit-primary)]/80 text-black font-extrabold text-xs px-3 py-1.5 rounded-full border border-[var(--pixit-primary)]/10 pointer-events-none">
         PIXIT Stylized
       </span>
     </div>

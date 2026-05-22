@@ -9,17 +9,17 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="relative w-full py-20 md:py-32 flex flex-col items-center justify-center text-center overflow-hidden">
         {/* Glow Effects */}
-        <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-[#B0FF00]/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-[var(--pixit-primary)]/10 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-orange-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
         <div className="max-w-4xl mx-auto px-4 z-10 flex flex-col items-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#111] border border-white/10 text-xs font-bold uppercase tracking-widest text-[#B0FF00] mb-6 animate-pulse">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#111] border border-white/10 text-xs font-bold uppercase tracking-widest text-[var(--pixit-primary)] mb-6 animate-pulse">
             <Sparkles className="w-4 h-4" /> Next-Gen AI Image Stylization
           </div>
           
           <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight leading-tight mb-8">
             Transform Photos Into <br />
-            <span className="bg-gradient-to-r from-[#B0FF00] via-teal-400 to-[#B0FF00] bg-clip-text text-transparent bg-300% animate-gradient-flow">
+            <span className="bg-gradient-to-r from-[var(--pixit-primary)] via-teal-400 to-[var(--pixit-primary)] bg-clip-text text-transparent bg-300% animate-gradient-flow">
               Studio-Grade Art
             </span>
           </h1>
@@ -31,7 +31,7 @@ const Landing = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center w-full max-w-md">
             <Link 
               to="/workspace"
-              className="group flex items-center justify-center gap-2 bg-[#B0FF00] text-black font-extrabold px-8 py-4 rounded-xl hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(176,255,0,0.4)] transition duration-200 cursor-pointer"
+              className="group flex items-center justify-center gap-2 bg-[var(--pixit-primary)] text-black font-extrabold px-8 py-4 rounded-xl hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(182,255,0,0.4)] transition duration-200 cursor-pointer"
             >
               Open Neural Editor <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -71,9 +71,9 @@ const Landing = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="bg-[#111115]/60 border border-white/10 rounded-2xl p-8 hover:border-[#B0FF00]/40 transition group relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#B0FF00]/5 rounded-bl-full pointer-events-none"></div>
-              <Zap className="w-10 h-10 text-[#B0FF00] mb-6" />
+            <div className="bg-[#111115]/60 border border-white/10 rounded-2xl p-8 hover:border-[var(--pixit-primary)]/40 transition group relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--pixit-primary)]/5 rounded-bl-full pointer-events-none"></div>
+              <Zap className="w-10 h-10 text-[var(--pixit-primary)] mb-6" />
               <h3 className="text-xl font-bold mb-3">6+ AI Stylization Filters</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Cartoonization, watercolor blending, graphite sketch, structural oil paint, and background removal at the click of a button.
@@ -91,9 +91,9 @@ const Landing = () => {
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-[#111115]/60 border border-white/10 rounded-2xl p-8 hover:border-[#B0FF00]/40 transition group relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#B0FF00]/5 rounded-bl-full pointer-events-none"></div>
-              <History className="w-10 h-10 text-[#B0FF00] mb-6" />
+            <div className="bg-[#111115]/60 border border-white/10 rounded-2xl p-8 hover:border-[var(--pixit-primary)]/40 transition group relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--pixit-primary)]/5 rounded-bl-full pointer-events-none"></div>
+              <History className="w-10 h-10 text-[var(--pixit-primary)] mb-6" />
               <h3 className="text-xl font-bold mb-3">Saved Projects Library</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Never lose your work. Your dashboard holds a complete database-backed history of all uploaded images and custom-applied styles.
@@ -111,9 +111,9 @@ const Landing = () => {
             </div>
 
             {/* Feature 5 */}
-            <div className="bg-[#111115]/60 border border-white/10 rounded-2xl p-8 hover:border-[#B0FF00]/40 transition group relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#B0FF00]/5 rounded-bl-full pointer-events-none"></div>
-              <Globe className="w-10 h-10 text-[#B0FF00] mb-6" />
+            <div className="bg-[#111115]/60 border border-white/10 rounded-2xl p-8 hover:border-[var(--pixit-primary)]/40 transition group relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--pixit-primary)]/5 rounded-bl-full pointer-events-none"></div>
+              <Globe className="w-10 h-10 text-[var(--pixit-primary)] mb-6" />
               <h3 className="text-xl font-bold mb-3">Community Showcase</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Make your creations public with a simple toggle. View trending styles from other creators and inspect their exact settings.
@@ -161,8 +161,8 @@ const Landing = () => {
           </div>
 
           {/* Popular Creator Tier */}
-          <div className="bg-[#111115] border-2 border-[#B0FF00] rounded-2xl p-8 flex flex-col justify-between hover:-translate-y-1 transition duration-300 relative shadow-[0_10px_35px_rgba(176,255,0,0.15)]">
-            <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#B0FF00] text-black text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest">
+          <div className="bg-[#111115] border-2 border-[var(--pixit-primary)] rounded-2xl p-8 flex flex-col justify-between hover:-translate-y-1 transition duration-300 relative shadow-[0_10px_35px_rgba(182,255,0,0.15)]">
+            <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[var(--pixit-primary)] text-black text-xs font-black px-4 py-1 rounded-full uppercase tracking-widest">
               Most Popular
             </span>
             <div>
@@ -177,7 +177,7 @@ const Landing = () => {
                 <li className="text-gray-200 text-sm flex items-center gap-2.5">✓ High-definition WebP downloads</li>
               </ul>
             </div>
-            <Link to="/workspace" className="w-full py-3 bg-[#B0FF00] text-black font-extrabold text-center rounded-xl hover:shadow-[0_6px_20px_rgba(176,255,0,0.3)] transition cursor-pointer">
+            <Link to="/workspace" className="w-full py-3 bg-[var(--pixit-primary)] text-black font-extrabold text-center rounded-xl hover:shadow-[0_6px_20px_rgba(182,255,0,0.3)] transition cursor-pointer">
               Go Pro
             </Link>
           </div>
@@ -212,7 +212,7 @@ const Landing = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
           <div className="bg-[#111115]/50 border border-white/10 rounded-2xl p-8">
-            <div className="flex gap-1 text-[#B0FF00] mb-4">
+            <div className="flex gap-1 text-[var(--pixit-primary)] mb-4">
               <Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" />
             </div>
             <p className="text-gray-300 text-sm italic mb-6 leading-relaxed">
@@ -223,7 +223,7 @@ const Landing = () => {
           </div>
 
           <div className="bg-[#111115]/50 border border-white/10 rounded-2xl p-8">
-            <div className="flex gap-1 text-[#B0FF00] mb-4">
+            <div className="flex gap-1 text-[var(--pixit-primary)] mb-4">
               <Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" />
             </div>
             <p className="text-gray-300 text-sm italic mb-6 leading-relaxed">

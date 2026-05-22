@@ -13,7 +13,7 @@ function App() {
         {/* Grid Background */}
         <div className="absolute inset-0 pointer-events-none z-[-1]" 
              style={{
-               backgroundImage: 'linear-gradient(rgba(176, 255, 0, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(176, 255, 0, 0.03) 1px, transparent 1px)',
+               backgroundImage: 'linear-gradient(rgba(182, 255, 0, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(182, 255, 0, 0.03) 1px, transparent 1px)',
                backgroundSize: '60px 60px'
              }}
         ></div>

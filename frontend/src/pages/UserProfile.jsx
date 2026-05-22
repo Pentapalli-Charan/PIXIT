@@ -31,7 +31,7 @@ const UserProfile = () => {
         <p className="text-gray-500 text-sm mb-6">Please log in to view your profile and account settings.</p>
         <button 
           onClick={() => navigate('/')} 
-          className="bg-[#B0FF00] text-black font-extrabold px-6 py-2 rounded-lg"
+          className="bg-[var(--pixit-primary)] text-black font-extrabold px-6 py-2 rounded-lg"
         >
           Return Home
         </button>
@@ -56,7 +56,7 @@ const UserProfile = () => {
       </div>
 
       {successMsg && (
-        <div className="mb-6 bg-[#B0FF00]/10 border border-[#B0FF00]/30 text-[#B0FF00] text-sm p-4 rounded-xl flex items-center gap-2">
+        <div className="mb-6 bg-[var(--pixit-primary)]/10 border border-[var(--pixit-primary)]/30 text-[var(--pixit-primary)] text-sm p-4 rounded-xl flex items-center gap-2">
           <Check className="w-4 h-4" /> {successMsg}
         </div>
       )}
@@ -65,7 +65,7 @@ const UserProfile = () => {
         {/* Navigation Tabs (Sidebar style) */}
         <div className="md:col-span-1 flex flex-col gap-3">
           <div className="bg-[#111115]/80 border border-slate-800 rounded-2xl p-5 text-center flex flex-col items-center">
-            <div className="w-16 h-16 bg-slate-900 border border-white/10 rounded-full flex items-center justify-center text-2xl font-black text-[#B0FF00] mb-4 uppercase">
+            <div className="w-16 h-16 bg-slate-900 border border-white/10 rounded-full flex items-center justify-center text-2xl font-black text-[var(--pixit-primary)] mb-4 uppercase">
               {user.username[0]}
             </div>
             <h3 className="font-extrabold text-sm text-white">{user.username}</h3>
@@ -85,7 +85,7 @@ const UserProfile = () => {
           {/* Profile details */}
           <div className="bg-[#111115]/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
             <h2 className="text-sm font-extrabold text-white uppercase tracking-wider mb-6 flex items-center gap-2">
-              <User className="w-4 h-4 text-[#B0FF00]" /> General Profile Information
+              <User className="w-4 h-4 text-[var(--pixit-primary)]" /> General Profile Information
             </h2>
             
             <form onSubmit={handleSaveSettings} className="space-y-4">
@@ -105,7 +105,7 @@ const UserProfile = () => {
                     type="text" 
                     value="Free Canvas Starter" 
                     disabled 
-                    className="w-full bg-[#B0FF00]/5 border border-[#B0FF00]/10 rounded-lg p-2.5 text-[#B0FF00] text-xs font-bold cursor-not-allowed"
+                    className="w-full bg-[var(--pixit-primary)]/5 border border-[var(--pixit-primary)]/10 rounded-lg p-2.5 text-[var(--pixit-primary)] text-xs font-bold cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -127,7 +127,7 @@ const UserProfile = () => {
                     type="checkbox" 
                     checked={emailNotification}
                     onChange={(e) => setEmailNotification(e.target.checked)}
-                    className="rounded border-slate-800 text-[#B0FF00] focus:ring-[#B0FF00]"
+                    className="rounded border-slate-800 text-[var(--pixit-primary)] focus:ring-[var(--pixit-primary)]"
                   />
                   <span className="text-gray-300 text-xs font-semibold">Notify me about processing updates and server status.</span>
                 </label>
@@ -136,7 +136,7 @@ const UserProfile = () => {
                     type="checkbox" 
                     checked={marketingEmail}
                     onChange={(e) => setMarketingEmail(e.target.checked)}
-                    className="rounded border-slate-800 text-[#B0FF00] focus:ring-[#B0FF00]"
+                    className="rounded border-slate-800 text-[var(--pixit-primary)] focus:ring-[var(--pixit-primary)]"
                   />
                   <span className="text-gray-300 text-xs font-semibold">Receive emails on trending styles and gallery highlights.</span>
                 </label>
@@ -145,7 +145,7 @@ const UserProfile = () => {
               <div className="pt-4 flex justify-end">
                 <button 
                   type="submit"
-                  className="bg-[#B0FF00] text-black font-extrabold text-xs uppercase px-5 py-2.5 rounded-xl hover:shadow-[0_4px_15px_rgba(176,255,0,0.25)] transition cursor-pointer"
+                  className="bg-[var(--pixit-primary)] text-black font-extrabold text-xs uppercase px-5 py-2.5 rounded-xl hover:shadow-[0_4px_15px_rgba(182,255,0,0.25)] transition cursor-pointer"
                 >
                   Save Settings
                 </button>
@@ -156,16 +156,16 @@ const UserProfile = () => {
           {/* Billing Plan upgrade mockup */}
           <div className="bg-[#111115]/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
             <h2 className="text-sm font-extrabold text-white uppercase tracking-wider mb-6 flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-[#B0FF00]" /> Subscription Tiers
+              <CreditCard className="w-4 h-4 text-[var(--pixit-primary)]" /> Subscription Tiers
             </h2>
-            <div className="p-4 rounded-xl border border-[#B0FF00]/20 bg-[#B0FF00]/5 flex items-center justify-between">
+            <div className="p-4 rounded-xl border border-[var(--pixit-primary)]/20 bg-[var(--pixit-primary)]/5 flex items-center justify-between">
               <div>
                 <div className="font-extrabold text-sm text-white">Free Starter Tier</div>
                 <p className="text-gray-400 text-xs mt-0.5 leading-relaxed">You are currently using the free model playground. Limits: 5 saved projects maximum.</p>
               </div>
               <button 
                 onClick={() => navigate('/')}
-                className="bg-[#B0FF00] text-black font-black text-[10px] uppercase px-4 py-2 rounded-lg hover:shadow-[0_0_10px_#B0FF00] transition cursor-pointer"
+                className="bg-[var(--pixit-primary)] text-black font-black text-[10px] uppercase px-4 py-2 rounded-lg hover:shadow-[0_0_10px_var(--pixit-primary)] transition cursor-pointer"
               >
                 Upgrade to Pro
               </button>
