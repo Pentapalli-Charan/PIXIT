@@ -21,8 +21,13 @@ RUN npm run build
 # --- Runtime Stage ---
 FROM nginx:alpine
 
-# Copy custom nginx configuration for routing fallback
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Set default port to 80 for local development/Jenkins compatibility
+ENV PORT=80
+# Restrict envsubst to ONLY replace the PORT variable, leaving Nginx's internal $uri variables intact
+ENV NGINX_ENVSUBST_FILTER=PORT
+
+# Copy custom nginx configuration as a template for envsubst processing
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 # Copy build assets to default nginx directory
 COPY --from=builder /app/dist /usr/share/nginx/html
