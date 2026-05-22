@@ -68,6 +68,22 @@ try:
 except Exception as e:
     logger.critical(f"Failed to initialize PostgreSQL tables: {e}")
 
+# Automated Schema Upgrade Check to append missing columns (e.g. created_at, reset_token)
+def upgrade_db_schema():
+    from sqlalchemy import text
+    try:
+        with engine.begin() as conn:
+            # Upgrade users table columns if they do not exist
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token VARCHAR"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMP WITH TIME ZONE"))
+            logger.info("PostgreSQL database schema verification completed successfully.")
+    except Exception as e:
+        logger.error(f"PostgreSQL database schema verification failed: {e}")
+
+# Trigger schema check
+upgrade_db_schema()
+
 def get_db():
     db = SessionLocal()
     try:
