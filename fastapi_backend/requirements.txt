@@ -8,3 +8,4 @@ pydantic
 pydantic-settings
 email-validator
 prometheus-fastapi-instrumentator
+psycopg2-binary
