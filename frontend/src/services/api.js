@@ -73,14 +73,50 @@ export const api = {
     });
   },
 
-  uploadImage: async (file, style) => {
+  uploadImage: async (file, style, settings = null) => {
     const formData = new FormData();
     formData.append('image', file);
     formData.append('style', style);
+    if (settings) {
+      formData.append('settings', JSON.stringify(settings));
+    }
 
     return request('/upload/', {
       method: 'POST',
       body: formData
+    });
+  },
+
+  restylizeProject: async (projectId, style, settings = null) => {
+    const formData = new FormData();
+    formData.append('style', style);
+    if (settings) {
+      formData.append('settings', JSON.stringify(settings));
+    }
+
+    return request(`/upload/project/${projectId}/stylize`, {
+      method: 'POST',
+      body: formData
+    });
+  },
+
+  getHistory: async () => {
+    return request('/upload/history');
+  },
+
+  getGallery: async () => {
+    return request('/upload/gallery');
+  },
+
+  togglePublicVisibility: async (stylizationId, isPublic) => {
+    return request(`/upload/stylization/${stylizationId}/public?is_public=${isPublic}`, {
+      method: 'PATCH'
+    });
+  },
+
+  deleteProject: async (projectId) => {
+    return request(`/upload/project/${projectId}`, {
+      method: 'DELETE'
     });
   }
 };
