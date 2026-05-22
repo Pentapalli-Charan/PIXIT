@@ -55,7 +55,9 @@ services:
 
   # Grafana dashboard visualization
   grafana:
-    image: grafana/grafana:10.0.3
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile
     restart: always
     volumes:
       # Persist Grafana dashboards, plugins, and settings

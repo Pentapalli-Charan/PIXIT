@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: 'PIXIT Monitoring'
+    orgId: 1
+    folder: 'PIXIT'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
