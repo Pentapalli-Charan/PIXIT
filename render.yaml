@@ -1,11 +1,11 @@
 services:
-  # FastAPI Backend Web Service
+  # FastAPI Backend Web Service (Prebuilt Docker Image)
   - type: web
     name: pixit-backend
-    runtime: docker
+    runtime: image
+    image:
+      url: docker.io/charanpentapalli/pixit-backend:latest
     plan: free
-    dockerContext: ./fastapi_backend
-    dockerfilePath: ./fastapi_backend/Dockerfile
     envVars:
       - key: PORT
         value: 8000
@@ -18,18 +18,13 @@ services:
       - key: SECRET_KEY
         generateValue: true
 
-  # React Frontend Static Site
+  # React Frontend Web Service (Prebuilt Docker Image)
   - type: web
     name: pixit-frontend
-    runtime: static
-    buildCommand: npm run build
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: pixit-backend
-          property: host
+    runtime: image
+    image:
+      url: docker.io/charanpentapalli/pixit-frontend:latest
+    plan: free
 
 databases:
   # Managed PostgreSQL Database
