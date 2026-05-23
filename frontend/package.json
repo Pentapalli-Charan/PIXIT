@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "clean": "node -e \"const fs = require('fs'); ['dist', 'node_modules/.vite'].forEach(p => fs.rmSync(p, { recursive: true, force: true }))\"",
+    "build": "npm run clean && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

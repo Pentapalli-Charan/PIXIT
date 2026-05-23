@@ -87,8 +87,7 @@ jobs:
           # If the secret VITE_API_URL is set, it will be used. Otherwise, it defaults to the Dockerfile fallback.
           build-args: |
             VITE_API_URL=${{ secrets.VITE_API_URL || 'http://localhost:8000' }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: true
 
       - name: Trigger Backend Redeploy
         run: |

@@ -8,6 +8,26 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Clear any service workers temporarily
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister().then(function(boolean) {
+              console.log('Service worker unregistered:', boolean);
+            });
+          }
+        });
+      }
+      // Clear Cache Storage API caches
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (let name of names) {
+            caches.delete(name);
+          }
+        });
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
