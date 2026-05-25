@@ -6,19 +6,25 @@ from core.config import settings
 
 logger = logging.getLogger("pixit.database")
 
-# Enforce PostgreSQL Only
+# Enforce PostgreSQL or SQLite
 db_url = settings.SQLALCHEMY_DATABASE_URL
-if not db_url or not (db_url.startswith("postgresql") or db_url.startswith("postgres")):
-    logger.critical("SQLite or invalid database URL detected. PIXIT is configured to run on PostgreSQL only.")
-    raise ValueError("Invalid Database URL: Only PostgreSQL is supported in this deployment.")
+if not db_url or not (db_url.startswith("postgresql") or db_url.startswith("postgres") or db_url.startswith("sqlite")):
+    logger.critical("SQLite or invalid database URL detected. PIXIT is configured to run on PostgreSQL or SQLite for local dev.")
+    raise ValueError("Invalid Database URL.")
 
-# Standard PostgreSQL engine configuration
-engine = create_engine(
-    db_url,
-    pool_size=10,
-    max_overflow=20,
-    pool_pre_ping=True
-)
+# Engine configuration
+if db_url.startswith("sqlite"):
+    engine = create_engine(
+        db_url,
+        connect_args={"check_same_thread": False}
+    )
+else:
+    engine = create_engine(
+        db_url,
+        pool_size=10,
+        max_overflow=20,
+        pool_pre_ping=True
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -71,6 +77,9 @@ except Exception as e:
 # Automated Schema Upgrade Check to append missing columns (e.g. created_at, reset_token)
 def upgrade_db_schema():
     from sqlalchemy import text
+    if not db_url.startswith("postgresql") and not db_url.startswith("postgres"):
+        logger.info("Skipping PostgreSQL schema upgrade checks on non-PostgreSQL engine.")
+        return
     try:
         with engine.begin() as conn:
             # Upgrade users table columns if they do not exist
