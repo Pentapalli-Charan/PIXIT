@@ -1,14 +1,41 @@
-import React, { createContext, useState, useContext } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useState, useContext, useEffect } from 'react';
 
 const AuthContext = createContext(null);
+
+const decodeToken = (token) => {
+  try {
+    if (!token) return null;
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return null;
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error("Failed to decode JWT token:", e);
+    return null;
+  }
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const token = localStorage.getItem('token');
-      const username = localStorage.getItem('username');
-      if (token && username) {
-        return { username, token };
+      if (token && token !== 'undefined' && token !== 'null') {
+        const decoded = decodeToken(token);
+        if (decoded && decoded.sub) {
+          // Check expiration
+          const now = Math.floor(Date.now() / 1000);
+          if (decoded.exp && decoded.exp > now) {
+            return { username: decoded.sub, token };
+          } else {
+            // Expired token, clear it
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+          }
+        }
       }
     } catch (e) {
       console.error("Failed to read auth state from localStorage:", e);
@@ -18,11 +45,13 @@ export const AuthProvider = ({ children }) => {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  const login = (userData) => {
-    setUser(userData);
+  const login = (token) => {
     try {
-      localStorage.setItem('token', userData.token);
-      localStorage.setItem('username', userData.username);
+      const decoded = decodeToken(token);
+      const username = decoded?.sub || 'User';
+      setUser({ username, token });
+      localStorage.setItem('token', token);
+      localStorage.setItem('username', username);
     } catch (e) {
       console.error("Failed to persist auth state to localStorage:", e);
     }
@@ -38,6 +67,15 @@ export const AuthProvider = ({ children }) => {
       console.error("Failed to remove auth state from localStorage:", e);
     }
   };
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      logout();
+      setIsAuthModalOpen(true);
+    };
+    window.addEventListener('auth-unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('auth-unauthorized', handleUnauthorized);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ 

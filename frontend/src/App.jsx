@@ -1,6 +1,5 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Navbar, AuthModal } from './components';
+import { Navbar, AuthModal, ProtectedRoute } from './components';
 import { Landing, Workspace, CommunityGallery, UserHistory, UserProfile } from './pages';
 import { useAuth } from './context/AuthContext';
 
@@ -16,7 +15,7 @@ function App() {
                backgroundImage: 'linear-gradient(rgba(182, 255, 0, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(182, 255, 0, 0.03) 1px, transparent 1px)',
                backgroundSize: '60px 60px'
              }}
-        ></div>
+         ></div>
 
         <div>
           <Navbar />
@@ -26,11 +25,20 @@ function App() {
               <Route path="/" element={<Landing />} />
               <Route path="/workspace" element={<Workspace />} />
               <Route path="/gallery" element={<CommunityGallery />} />
-              <Route path="/history" element={<UserHistory />} />
-              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/history" element={
+                <ProtectedRoute>
+                  <UserHistory />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <UserProfile />
+                </ProtectedRoute>
+              } />
             </Routes>
           </main>
         </div>
+
 
         {isAuthModalOpen && (
           <AuthModal />

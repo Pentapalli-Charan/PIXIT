@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
-import { Key, Mail, User as UserIcon, Lock, Sparkles, Check, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Key, Mail, User as UserIcon, Lock, Check, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const AuthModal = () => {
   const { login, setIsAuthModalOpen } = useAuth();
@@ -28,7 +28,7 @@ const AuthModal = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -100,7 +100,7 @@ const AuthModal = () => {
     try {
       if (mode === 'login') {
         const data = await api.login(formData.identifier, formData.password);
-        login({ username: formData.identifier, token: data.access });
+        login(data.access);
       } else if (mode === 'register') {
         await api.register({
           username: formData.username,
@@ -109,10 +109,18 @@ const AuthModal = () => {
         });
         setSuccess('Account created successfully! Directing you in...');
         // Automatically attempt to login after successful registration for better UX
-        const loginData = await api.login(formData.username, formData.password);
-        setTimeout(() => {
-          login({ username: formData.username, token: loginData.access });
-        }, 1000);
+        try {
+          const loginData = await api.login(formData.username, formData.password);
+          setTimeout(() => {
+            login(loginData.access);
+          }, 1000);
+        } catch (loginErr) {
+          console.error("Auto-login failed after register:", loginErr);
+          setSuccess('Account created successfully! Please log in manually.');
+          setTimeout(() => {
+            handleModeSwitch('login');
+          }, 2000);
+        }
       } else if (mode === 'forgot') {
         const data = await api.forgotPassword(formData.email);
         setSuccess(data.message || 'Reset token generated successfully!');
@@ -133,11 +141,23 @@ const AuthModal = () => {
     } catch (err) {
       console.error("Auth error:", err);
       // Map API details or connection errors beautifully
+      let errMsg = 'Failed to communicate with the service. Please verify your connection.';
       if (err.data && err.data.detail) {
-        setError(err.data.detail);
-      } else {
-        setError(err.message || 'Failed to communicate with the service. Please verify your connection.');
+        if (Array.isArray(err.data.detail)) {
+          // FastAPI validation error array
+          errMsg = err.data.detail.map(d => {
+            const field = d.loc ? d.loc[d.loc.length - 1] : '';
+            return `${field ? field.charAt(0).toUpperCase() + field.slice(1) + ': ' : ''}${d.msg}`;
+          }).join(', ');
+        } else if (typeof err.data.detail === 'string') {
+          errMsg = err.data.detail;
+        } else {
+          errMsg = JSON.stringify(err.data.detail);
+        }
+      } else if (err.message) {
+        errMsg = err.message;
       }
+      setError(errMsg);
     } finally {
       setIsLoading(false);
     }

@@ -44,6 +44,9 @@ async function request(endpoint, options = {}) {
     }
 
     if (!response.ok) {
+      if (response.status === 401) {
+        window.dispatchEvent(new Event('auth-unauthorized'));
+      }
       // Create a standardized error structure
       const error = new Error(data?.detail || data?.error || 'API Request failed');
       error.status = response.status;
