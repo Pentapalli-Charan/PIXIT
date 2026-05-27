@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Navbar, AuthModal, ProtectedRoute } from './components';
-import { Landing, Workspace, CommunityGallery, UserHistory, UserProfile, Pricing, Checkout, PaymentSuccess, PaymentFailed } from './pages';
+import { Landing, Workspace, CommunityGallery, UserHistory, UserProfile, Pricing, Checkout, PaymentSuccess, PaymentFailed, FilterMarketplace } from './pages';
 import { useAuth } from './context/AuthContext';
 
 function App() {
@@ -24,6 +24,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/workspace" element={<Workspace />} />
+              <Route path="/marketplace" element={<FilterMarketplace />} />
               <Route path="/gallery" element={<CommunityGallery />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/checkout" element={

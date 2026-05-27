@@ -7,4 +7,4 @@ export { default as Pricing } from './Pricing';
 export { default as Checkout } from './Checkout';
 export { default as PaymentSuccess } from './PaymentSuccess';
 export { default as PaymentFailed } from './PaymentFailed';
-
+export { default as FilterMarketplace } from './FilterMarketplace';

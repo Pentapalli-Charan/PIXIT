@@ -156,6 +156,84 @@ class ImageService:
             # Fast, high-quality oil painting simulation using cv2.stylization
             processed = cv2.stylization(img, sigma_s=45 + int(intensity * 40), sigma_r=0.25 + (intensity * 0.3))
 
+        elif style == "cyberpunk":
+            # Boost purple/pink/blue tones with a bilateral blur glow
+            b, g, r = cv2.split(img)
+            b = cv2.add(b, int(35 * intensity))
+            r = cv2.add(r, int(45 * intensity))
+            g = cv2.add(g, int(5 * intensity))
+            tinted = cv2.merge([b, g, r])
+            processed = cv2.bilateralFilter(tinted, d=9, sigmaColor=70, sigmaSpace=70)
+
+        elif style == "pixar":
+            # Smooth clay illustration look with high vibrant color saturation
+            pixar_blur = cv2.bilateralFilter(img, d=9, sigmaColor=85, sigmaSpace=85)
+            hsv = cv2.cvtColor(pixar_blur, cv2.COLOR_BGR2HSV).astype(np.float32)
+            hsv[:, :, 1] = np.clip(hsv[:, :, 1] * (1.15 + intensity * 0.35), 0, 255)
+            hsv[:, :, 2] = np.clip(hsv[:, :, 2] + 15, 0, 255)
+            pixar_color = cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2BGR)
+            processed = cv2.detailEnhance(pixar_color, sigma_s=8, sigma_r=0.2)
+
+        elif style == "vintage":
+            # Vintage sepia tint + vignette borders
+            sepia_matrix = np.array([
+                [0.272, 0.534, 0.131],
+                [0.349, 0.686, 0.168],
+                [0.393, 0.769, 0.189]
+            ])
+            sepia = cv2.transform(img, sepia_matrix)
+            rows, cols = img.shape[:2]
+            mask = np.zeros((rows, cols))
+            for i in range(rows):
+                for j in range(cols):
+                    dist = np.sqrt((i - rows/2)**2 + (j - cols/2)**2)
+                    max_dist = np.sqrt((rows/2)**2 + (cols/2)**2)
+                    mask[i, j] = 1.0 - (dist / max_dist) * 0.45 * intensity
+            processed = (sepia * mask[:, :, np.newaxis]).astype(np.uint8)
+
+        elif style == "cinematic":
+            # High dramatic contrast lut + cool teal shadows and warm highlights
+            lut = np.arange(256, dtype=np.uint8)
+            for i in range(256):
+                val = 255 / (1 + np.exp(-0.025 * (i - 127)))
+                lut[i] = np.clip(val, 0, 255)
+            cinematic_contrast = cv2.LUT(img, lut)
+            b, g, r = cv2.split(cinematic_contrast)
+            b = cv2.add(b, int(15 * intensity))
+            r = cv2.add(r, int(10 * intensity))
+            processed = cv2.merge([b, g, r])
+
+        elif style == "neon":
+            # Edge finding with glowing pink/cyan overlay
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+            edges = cv2.Canny(blurred, 30, 150)
+            kernel = np.ones((3, 3), np.uint8)
+            dilated = cv2.dilate(edges, kernel, iterations=1)
+            glow = np.zeros_like(img)
+            glow_color = [255, 0, 180] if intensity > 0.5 else [180, 255, 0]
+            glow[dilated > 0] = glow_color
+            glow_blur = cv2.GaussianBlur(glow, (15, 15), 0)
+            processed = cv2.addWeighted(img, 0.4, glow_blur, 0.6, 0)
+
+        elif style == "sharpen":
+            # Laplacian kernel sharpening matrix
+            kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+            processed = cv2.filter2D(img, -1, kernel)
+
+        elif style == "denoise":
+            # Fast bilateral-based color denoising
+            processed = cv2.fastNlMeansDenoisingColored(img, None, 10, 10, 7, 21)
+
+        elif style == "upscale":
+            # 2x Image Upscale interpolation (Lanczos)
+            processed = cv2.resize(img, (int(w * 2), int(h * 2)), interpolation=cv2.INTER_LANCZOS4)
+
+        elif style == "face_enhance":
+            # Skin smooth bilateral filter + lighting glow
+            smooth = cv2.bilateralFilter(img, d=9, sigmaColor=35, sigmaSpace=35)
+            processed = cv2.addWeighted(img, 0.35, smooth, 0.65, 0)
+
         elif style == "enhance":
             # Contrast Limited Adaptive Histogram Equalization (CLAHE) + Unsharp Masking
             ycrcb = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)

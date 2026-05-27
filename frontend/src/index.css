@@ -2,10 +2,64 @@
 
 :root {
   --pixit-primary: #B6FF00;
+  --bg-color: #07070a;
+  --text-color: #f4f4f5;
+  --panel-bg: #0f0f13;
+  --border-color: #1e293b;
+}
+
+.light {
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+  --panel-bg: #ffffff;
+  --border-color: #e2e8f0;
 }
 
 @layer base {
   body {
-    @apply bg-black text-white font-sans antialiased;
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
+}
+
+/* Overrides for Light Mode */
+.light .bg-\[\#111115\], 
+.light .bg-\[\#111115\]\/80,
+.light .bg-\[\#111115\]\/90,
+.light .bg-\[\#111115\]\/95 {
+  background-color: var(--panel-bg) !important;
+}
+
+.light .border-slate-800, 
+.light .border-white\/10,
+.light .border-slate-900 {
+  border-color: var(--border-color) !important;
+}
+
+.light .text-white,
+.light .text-gray-100 {
+  color: var(--text-color) !important;
+}
+
+.light .text-gray-400,
+.light .text-gray-500 {
+  color: #64748b !important;
+}
+
+.light .bg-black\/40 {
+  background-color: rgba(15, 23, 42, 0.03) !important;
+}
+
+.light .bg-black\/75 {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.light .hover\:bg-white\/5:hover {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+}
+
+.light .hover\:bg-slate-900:hover {
+  background-color: #f1f5f9 !important;
 }

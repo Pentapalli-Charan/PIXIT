@@ -45,6 +45,19 @@ export const AuthProvider = ({ children }) => {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+  const [profile, setProfile] = useState(null);
+
+  const refreshProfile = async () => {
+    try {
+      const { api } = await import('../services/api');
+      const data = await api.getProfile();
+      setProfile(data);
+      return data;
+    } catch (err) {
+      console.error("Failed to fetch profile details:", err);
+    }
+  };
+
   const login = (token) => {
     try {
       const decoded = decodeToken(token);
@@ -60,6 +73,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setProfile(null);
     try {
       localStorage.removeItem('token');
       localStorage.removeItem('username');
@@ -77,9 +91,19 @@ export const AuthProvider = ({ children }) => {
     return () => window.removeEventListener('auth-unauthorized', handleUnauthorized);
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      refreshProfile();
+    } else {
+      setProfile(null);
+    }
+  }, [user]);
+
   return (
     <AuthContext.Provider value={{ 
       user, 
+      profile,
+      refreshProfile,
       login, 
       logout, 
       isAuthModalOpen, 

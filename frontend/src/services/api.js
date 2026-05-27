@@ -96,12 +96,18 @@ export const api = {
     });
   },
 
-  uploadImage: async (file, style, settings = null) => {
+  uploadImage: async (file, style, settings = null, prompt = null, tags = null) => {
     const formData = new FormData();
     formData.append('image', file);
     formData.append('style', style);
     if (settings) {
       formData.append('settings', JSON.stringify(settings));
+    }
+    if (prompt) {
+      formData.append('prompt', prompt);
+    }
+    if (tags) {
+      formData.append('tags', tags);
     }
 
     return request('/upload/', {
@@ -110,11 +116,17 @@ export const api = {
     });
   },
 
-  restylizeProject: async (projectId, style, settings = null) => {
+  restylizeProject: async (projectId, style, settings = null, prompt = null, tags = null) => {
     const formData = new FormData();
     formData.append('style', style);
     if (settings) {
       formData.append('settings', JSON.stringify(settings));
+    }
+    if (prompt) {
+      formData.append('prompt', prompt);
+    }
+    if (tags) {
+      formData.append('tags', tags);
     }
 
     return request(`/upload/project/${projectId}/stylize`, {
@@ -127,12 +139,14 @@ export const api = {
     return request('/upload/history');
   },
 
-  getGallery: async () => {
-    return request('/upload/gallery');
+  getGallery: async (query = '') => {
+    const qParam = query ? `?query=${encodeURIComponent(query)}` : '';
+    return request(`/upload/gallery${qParam}`);
   },
 
-  togglePublicVisibility: async (stylizationId, isPublic) => {
-    return request(`/upload/stylization/${stylizationId}/public?is_public=${isPublic}`, {
+  togglePublicVisibility: async (stylizationId, isPublic, tags = null) => {
+    const tParam = tags ? `&tags=${encodeURIComponent(tags)}` : '';
+    return request(`/upload/stylization/${stylizationId}/public?is_public=${isPublic}${tParam}`, {
       method: 'PATCH'
     });
   },
@@ -140,6 +154,52 @@ export const api = {
   deleteProject: async (projectId) => {
     return request(`/upload/project/${projectId}`, {
       method: 'DELETE'
+    });
+  },
+
+  getProfile: async () => {
+    return request('/profile/');
+  },
+
+  updateProfile: async (profileData) => {
+    const formData = new FormData();
+    if (profileData.username) formData.append('username', profileData.username);
+    if (profileData.email) formData.append('email', profileData.email);
+    if (profileData.avatar_url) formData.append('avatar_url', profileData.avatar_url);
+    return request('/profile/update/', {
+      method: 'PATCH',
+      body: formData
+    });
+  },
+
+  likeStylization: async (stylizationId) => {
+    return request(`/upload/stylization/${stylizationId}/like`, {
+      method: 'POST'
+    });
+  },
+
+  unlikeStylization: async (stylizationId) => {
+    return request(`/upload/stylization/${stylizationId}/like`, {
+      method: 'DELETE'
+    });
+  },
+
+  getFavorites: async () => {
+    return request('/upload/favorites');
+  },
+
+  uploadBatch: async (files, style, settings = null) => {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+    formData.append('style', style);
+    if (settings) {
+      formData.append('settings', JSON.stringify(settings));
+    }
+    return request('/upload/batch', {
+      method: 'POST',
+      body: formData
     });
   }
 };

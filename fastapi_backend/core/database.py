@@ -40,6 +40,11 @@ class User(Base):
     # Forgot password reset fields
     reset_token = Column(String, nullable=True, index=True)
     reset_token_expires = Column(DateTime(timezone=True), nullable=True)
+    
+    avatar_url = Column(String, nullable=True)
+    credits = Column(Integer, default=50)
+    premium_credits = Column(Integer, default=0)
+    total_generations = Column(Integer, default=0)
 
     projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
     subscription = relationship("Subscription", back_populates="user", uselist=False, cascade="all, delete-orphan")
@@ -66,8 +71,17 @@ class Stylization(Base):
     settings_json = Column(JSON, nullable=True)
     is_public = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    likes_count = Column(Integer, default=0)
+    tags = Column(String, nullable=True)
+    prompt = Column(String, nullable=True)
 
     project = relationship("Project", back_populates="stylizations")
+
+class UserLike(Base):
+    __tablename__ = "user_likes"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    stylization_id = Column(Integer, ForeignKey("stylizations.id", ondelete="CASCADE"), nullable=False)
 
 class Subscription(Base):
     __tablename__ = "subscriptions"
@@ -118,6 +132,15 @@ def upgrade_db_schema():
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"))
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token VARCHAR"))
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMP WITH TIME ZONE"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS credits INTEGER DEFAULT 50"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS premium_credits INTEGER DEFAULT 0"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS total_generations INTEGER DEFAULT 0"))
+            
+            # Upgrade stylizations table columns if they do not exist
+            conn.execute(text("ALTER TABLE stylizations ADD COLUMN IF NOT EXISTS likes_count INTEGER DEFAULT 0"))
+            conn.execute(text("ALTER TABLE stylizations ADD COLUMN IF NOT EXISTS tags VARCHAR"))
+            conn.execute(text("ALTER TABLE stylizations ADD COLUMN IF NOT EXISTS prompt VARCHAR"))
             logger.info("PostgreSQL database schema verification completed successfully.")
     except Exception as e:
         logger.error(f"PostgreSQL database schema verification failed: {e}")

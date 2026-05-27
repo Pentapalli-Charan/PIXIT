@@ -169,3 +169,57 @@ def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db))
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database transaction error during password update."
         )
+
+from api.dependencies import get_current_user
+from fastapi import Form
+
+@router.get("/profile/")
+def get_user_profile(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    plan_name = "Free"
+    sub_status = "active"
+    period_end = None
+    if current_user.subscription:
+        plan_name = current_user.subscription.plan_name
+        sub_status = current_user.subscription.status
+        period_end = current_user.subscription.current_period_end
+
+    return {
+        "id": current_user.id,
+        "username": current_user.username,
+        "email": current_user.email,
+        "avatar_url": current_user.avatar_url,
+        "credits": current_user.credits,
+        "premium_credits": current_user.premium_credits,
+        "total_generations": current_user.total_generations,
+        "subscription": {
+            "plan_name": plan_name,
+            "status": sub_status,
+            "current_period_end": period_end
+        }
+    }
+
+@router.patch("/profile/update/")
+def update_user_profile(
+    username: str = Form(None),
+    email: str = Form(None),
+    avatar_url: str = Form(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if username:
+        exists = db.query(User).filter(User.username == username, User.id != current_user.id).first()
+        if exists:
+            raise HTTPException(status_code=400, detail="Username is already taken")
+        current_user.username = username
+    if email:
+        exists = db.query(User).filter(User.email == email, User.id != current_user.id).first()
+        if exists:
+            raise HTTPException(status_code=400, detail="Email is already taken")
+        current_user.email = email
+    if avatar_url:
+        current_user.avatar_url = avatar_url
+    db.commit()
+    return {"message": "Profile updated successfully"}

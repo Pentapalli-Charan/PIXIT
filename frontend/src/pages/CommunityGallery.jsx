@@ -2,18 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { Sparkles, Heart, Eye, ArrowUpRight, Search, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const CommunityGallery = () => {
   const navigate = useNavigate();
+  const { user, setIsAuthModalOpen } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [likedStatus, setLikedStatus] = useState({});
 
-  const fetchGallery = async () => {
+  const fetchGallery = async (query = '') => {
     setLoading(true);
+    setError(null);
     try {
-      const data = await api.getGallery();
+      const data = await api.getGallery(query);
       setItems(data);
     } catch (err) {
       console.error(err);
@@ -23,9 +27,14 @@ const CommunityGallery = () => {
     }
   };
 
+  // Trigger search on query update (debounced search is best, but direct effect on query is super smooth)
   useEffect(() => {
-    fetchGallery();
-  }, []);
+    const delayDebounce = setTimeout(() => {
+      fetchGallery(searchQuery);
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
 
   const handleTryStyle = (item) => {
     navigate('/workspace', { 
@@ -36,14 +45,36 @@ const CommunityGallery = () => {
     });
   };
 
-  const filteredItems = items.filter(item => {
-    const query = searchQuery.toLowerCase();
-    return (
-      item.project_title.toLowerCase().includes(query) ||
-      item.username.toLowerCase().includes(query) ||
-      item.style_applied.toLowerCase().includes(query)
-    );
-  });
+  const handleLikeToggle = async (stylizationId, e) => {
+    e.stopPropagation();
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    const currentlyLiked = !!likedStatus[stylizationId];
+    try {
+      if (currentlyLiked) {
+        await api.unlikeStylization(stylizationId);
+        setLikedStatus(prev => ({ ...prev, [stylizationId]: false }));
+        setItems(prev => prev.map(item => 
+          item.stylization_id === stylizationId 
+            ? { ...item, likes_count: Math.max(0, item.likes_count - 1) } 
+            : item
+        ));
+      } else {
+        await api.likeStylization(stylizationId);
+        setLikedStatus(prev => ({ ...prev, [stylizationId]: true }));
+        setItems(prev => prev.map(item => 
+          item.stylization_id === stylizationId 
+            ? { ...item, likes_count: item.likes_count + 1 } 
+            : item
+        ));
+      }
+    } catch (err) {
+      console.error("Failed to toggle like:", err);
+    }
+  };
 
   return (
     <div className="py-8 w-full max-w-6xl mx-auto px-4 text-white">
@@ -61,35 +92,35 @@ const CommunityGallery = () => {
           <Search className="absolute left-4 top-3.5 w-4 h-4 text-gray-500" />
           <input 
             type="text" 
-            placeholder="Search styles, titles, or creators..."
+            placeholder="Search styles, tags, or creators..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#111115]/80 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white focus:border-[var(--pixit-primary)] outline-none transition"
+            className="w-full bg-[#111115]/80 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white focus:border-[var(--pixit-primary)] outline-none transition placeholder-gray-600"
           />
         </div>
       </div>
 
-      {loading ? (
+      {loading && items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
           <div className="w-10 h-10 border-4 border-[var(--pixit-primary)]/20 border-t-[var(--pixit-primary)] rounded-full animate-spin mb-4"></div>
-          <span className="text-gray-500 text-xs font-bold uppercase tracking-widest">Loading Showcase Feed...</span>
+          <span className="text-gray-500 text-xs font-bold uppercase tracking-widest animate-pulse">Loading Showcase Feed...</span>
         </div>
       ) : error ? (
-        <div className="bg-red-950/20 border border-red-500/30 text-red-500 p-6 rounded-2xl text-center">
+        <div className="bg-red-950/20 border border-red-500/30 text-red-500 p-6 rounded-3xl text-center shadow-lg">
           <p className="font-bold">{error}</p>
           <button 
-            onClick={fetchGallery}
+            onClick={() => fetchGallery(searchQuery)}
             className="mt-3 text-xs bg-red-500 text-white font-extrabold px-4 py-2 rounded-lg hover:bg-red-600 transition cursor-pointer"
           >
             Retry Connection
           </button>
         </div>
-      ) : filteredItems.length === 0 ? (
-        <div className="border border-dashed border-slate-800 rounded-3xl p-16 text-center bg-black/20">
+      ) : items.length === 0 ? (
+        <div className="border border-dashed border-slate-800 rounded-3xl p-16 text-center bg-black/20 shadow-2xl">
           <h3 className="text-lg font-bold text-gray-400 mb-2">No stylized artwork found</h3>
           <p className="text-gray-600 text-xs mb-6 max-w-xs mx-auto">Try typing a different query or style filter above.</p>
           <button 
-            onClick={handleTryStyle}
+            onClick={() => navigate('/workspace')}
             className="bg-[var(--pixit-primary)] text-black font-extrabold text-xs uppercase px-5 py-2.5 rounded-xl cursor-pointer"
           >
             Create Your Own
@@ -97,61 +128,83 @@ const CommunityGallery = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredItems.map(item => (
-            <div 
-              key={item.stylization_id} 
-              className="bg-[#111115]/60 border border-slate-800/80 rounded-2xl overflow-hidden group hover:border-[var(--pixit-primary)]/40 transition duration-300 flex flex-col justify-between"
-            >
-              {/* Image Frame */}
-              <div className="relative aspect-square w-full overflow-hidden bg-black/40">
-                <img 
-                  src={item.processed_url} 
-                  alt={item.project_title} 
-                  className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-                
-                {/* Style Badge */}
-                <span className="absolute top-3 left-3 bg-[var(--pixit-primary)]/95 text-black text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-lg">
-                  {item.style_applied}
-                </span>
-
-                {/* Overlaid Action Button */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center backdrop-blur-xs">
-                  <button 
-                    type="button"
-                    onClick={() => handleTryStyle(item)}
-                    className="bg-white text-black font-extrabold text-xs px-5 py-3 rounded-xl hover:scale-105 transition flex items-center gap-1.5 cursor-pointer shadow-xl"
-                  >
-                    Try Style <ArrowUpRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Content Panel */}
-              <div className="p-4 flex flex-col gap-2 bg-[#111115]/90">
-                <div className="flex justify-between items-start gap-2">
-                  <h3 className="font-extrabold text-sm text-white line-clamp-1 leading-snug">
-                    {item.project_title}
-                  </h3>
-                  <span className="text-gray-500 text-[10px] whitespace-nowrap mt-0.5">
-                    {new Date(item.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between mt-2 pt-2.5 border-t border-white/5">
-                  <span className="text-xs text-gray-400 font-bold flex items-center gap-1">
-                    👤 {item.username}
-                  </span>
+          {items.map(item => {
+            const isLiked = !!likedStatus[item.stylization_id];
+            return (
+              <div 
+                key={item.stylization_id} 
+                className="bg-[#111115]/60 border border-slate-800/80 rounded-3xl overflow-hidden group hover:border-[var(--pixit-primary)]/40 transition duration-300 flex flex-col justify-between shadow-xl"
+              >
+                {/* Image Frame */}
+                <div className="relative aspect-square w-full overflow-hidden bg-black/40">
+                  <img 
+                    src={item.processed_url} 
+                    alt={item.project_title} 
+                    className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
                   
-                  {item.settings && (
-                    <span className="text-[10px] text-gray-600 flex items-center gap-1">
-                      <Info className="w-3 h-3" /> Intensity {(item.settings.intensity * 100).toFixed(0)}%
+                  {/* Style Badge */}
+                  <span className="absolute top-3 left-3 bg-[var(--pixit-primary)]/95 text-black text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-lg">
+                    {item.style_applied}
+                  </span>
+
+                  {/* Overlaid Action Button */}
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center backdrop-blur-xs">
+                    <button 
+                      type="button"
+                      onClick={() => handleTryStyle(item)}
+                      className="bg-white text-black font-extrabold text-xs px-5 py-3 rounded-xl hover:scale-105 transition flex items-center gap-1.5 cursor-pointer shadow-xl"
+                    >
+                      Try Style <ArrowUpRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content Panel */}
+                <div className="p-4 flex flex-col gap-2 bg-[#111115]/90">
+                  <div className="flex justify-between items-start gap-2">
+                    <h3 className="font-extrabold text-sm text-white line-clamp-1 leading-snug">
+                      {item.project_title}
+                    </h3>
+                    <span className="text-gray-500 text-[10px] whitespace-nowrap mt-0.5">
+                      {new Date(item.created_at).toLocaleDateString()}
                     </span>
+                  </div>
+
+                  {item.prompt && (
+                    <p className="text-[10px] text-gray-500 italic mt-0.5 line-clamp-1">
+                      Prompt: "{item.prompt}"
+                    </p>
                   )}
+
+                  {item.tags && (
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      {item.tags.split(',').map((tag, idx) => (
+                        <span key={idx} className="text-[9px] text-[var(--pixit-primary)] bg-[var(--pixit-primary)]/5 px-2 py-0.5 rounded border border-[var(--pixit-primary)]/10 font-bold">
+                          #{tag.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-white/5">
+                    <span className="text-xs text-gray-400 font-bold flex items-center gap-1">
+                      👤 {item.username}
+                    </span>
+                    
+                    <button
+                      onClick={(e) => handleLikeToggle(item.stylization_id, e)}
+                      className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-red-500 transition cursor-pointer"
+                    >
+                      <Heart className={`w-4 h-4 ${isLiked ? 'text-red-500 fill-current' : ''}`} />
+                      <span>{item.likes_count}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
