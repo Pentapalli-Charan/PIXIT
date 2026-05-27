@@ -343,7 +343,7 @@
           },
           "editorMode": "code",
           "expr": "rate(process_cpu_seconds_total{job=\"fastapi-backend\"}[1m]) * 100",
-          "legendFormat": "CPU Usage (%)",
+          "legendFormat": "{{instance}} CPU",
           "range": true,
           "refId": "A"
         },
@@ -354,7 +354,7 @@
           },
           "editorMode": "code",
           "expr": "process_resident_memory_bytes{job=\"fastapi-backend\"} / 1024 / 1024",
-          "legendFormat": "Memory RAM (MB)",
+          "legendFormat": "{{instance}} Memory (MB)",
           "range": true,
           "refId": "B"
         }

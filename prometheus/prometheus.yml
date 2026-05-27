@@ -8,11 +8,11 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  # Scrape the FastAPI backend metrics
+  # Scrape the FastAPI backend metrics from individual replicas
   - job_name: 'fastapi-backend'
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['backend:8000']
+      - targets: ['backend-1:8000', 'backend-2:8000', 'backend-3:8000']
 
   # Scrape Node Exporter for host-level CPU and memory usage
   - job_name: 'node-exporter'

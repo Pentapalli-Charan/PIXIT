@@ -75,6 +75,16 @@ app.include_router(health.router, prefix="/health", tags=["health"])
 app.include_router(auth.router, tags=["auth"])
 app.include_router(upload.router, prefix="/upload", tags=["upload"])
 
+import socket
+instance_name = os.environ.get("INSTANCE_NAME", socket.gethostname())
+
+@app.middleware("http")
+async def add_backend_header(request, call_next):
+    logger.info(f"Instance '{instance_name}' handling request: {request.method} {request.url.path}")
+    response = await call_next(request)
+    response.headers["X-Backend-Server"] = instance_name
+    return response
+
 # Instrument with Prometheus metrics
 Instrumentator().instrument(app).expose(app)
 

@@ -1,23 +1,72 @@
 version: '3.8'
 
 services:
-  # FastAPI backend service
-  backend:
+  # FastAPI backend replica 1
+  backend-1:
     build:
       context: ./fastapi_backend
       dockerfile: Dockerfile
     restart: always
-    ports:
-      - "${BACKEND_PORT:-8000}:8000"
     volumes:
-      # Persist SQLite database and uploaded images across container restarts
       - pixit_db_data:/app/data
       - pixit_uploads:/app/uploads
     environment:
       - SQLALCHEMY_DATABASE_URL=sqlite:///./data/pixit.db
       - ALLOWED_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000", "*"]
+      - INSTANCE_NAME=backend-1
     env_file:
       - ./fastapi_backend/.env
+    networks:
+      - pixit_network
+
+  # FastAPI backend replica 2
+  backend-2:
+    build:
+      context: ./fastapi_backend
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - pixit_db_data:/app/data
+      - pixit_uploads:/app/uploads
+    environment:
+      - SQLALCHEMY_DATABASE_URL=sqlite:///./data/pixit.db
+      - ALLOWED_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000", "*"]
+      - INSTANCE_NAME=backend-2
+    env_file:
+      - ./fastapi_backend/.env
+    networks:
+      - pixit_network
+
+  # FastAPI backend replica 3
+  backend-3:
+    build:
+      context: ./fastapi_backend
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - pixit_db_data:/app/data
+      - pixit_uploads:/app/uploads
+    environment:
+      - SQLALCHEMY_DATABASE_URL=sqlite:///./data/pixit.db
+      - ALLOWED_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000", "*"]
+      - INSTANCE_NAME=backend-3
+    env_file:
+      - ./fastapi_backend/.env
+    networks:
+      - pixit_network
+
+  # Nginx Load Balancer for routing API traffic round-robin across backend replicas
+  backend-lb:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      - backend-1
+      - backend-2
+      - backend-3
     networks:
       - pixit_network
 
@@ -33,7 +82,7 @@ services:
     ports:
       - "${FRONTEND_PORT:-3000}:80"
     depends_on:
-      - backend
+      - backend-lb
     networks:
       - pixit_network
 
@@ -49,7 +98,9 @@ services:
     ports:
       - "${PROMETHEUS_PORT:-9090}:9090"
     depends_on:
-      - backend
+      - backend-1
+      - backend-2
+      - backend-3
     networks:
       - pixit_network
 
