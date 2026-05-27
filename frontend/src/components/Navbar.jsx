@@ -45,6 +45,9 @@ const Navbar = () => {
           <NavLink to="/gallery" className={linkClass}>
             <Image className="w-4 h-4" /> Community
           </NavLink>
+          <NavLink to="/pricing" className={linkClass}>
+            <span>💎</span> Pricing
+          </NavLink>
           {user && (
             <NavLink to="/history" className={linkClass}>
               <History className="w-4 h-4" /> Saved Library

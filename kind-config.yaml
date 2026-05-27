@@ -1,0 +1,22 @@
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+name: pixit-k8s
+nodes:
+- role: control-plane
+  extraPortMappings:
+  # Map host port 30001 to container port 30001 (NodePort for Nginx Load Balancer / Frontend)
+  - containerPort: 30001
+    hostPort: 30001
+    listenAddress: "0.0.0.0"
+  # Map host port 30002 to container port 30002 (NodePort for Backend API)
+  - containerPort: 30002
+    hostPort: 30002
+    listenAddress: "0.0.0.0"
+  # Map host port 30003 to container port 30003 (NodePort for Prometheus)
+  - containerPort: 30003
+    hostPort: 30003
+    listenAddress: "0.0.0.0"
+  # Map host port 30004 to container port 30004 (NodePort for Grafana)
+  - containerPort: 30004
+    hostPort: 30004
+    listenAddress: "0.0.0.0"

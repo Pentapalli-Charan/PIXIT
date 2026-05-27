@@ -42,6 +42,8 @@ class User(Base):
     reset_token_expires = Column(DateTime(timezone=True), nullable=True)
 
     projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
+    subscription = relationship("Subscription", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    billing_histories = relationship("BillingHistory", back_populates="user", cascade="all, delete-orphan")
 
 class Project(Base):
     __tablename__ = "projects"
@@ -66,6 +68,36 @@ class Stylization(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     project = relationship("Project", back_populates="stylizations")
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=True)
+    plan_name = Column(String, default="Free") # "Free", "Pro", "Enterprise"
+    status = Column(String, default="active") # "active", "canceled", "incomplete"
+    billing_cycle = Column(String, default="monthly") # "monthly", "yearly"
+    current_period_end = Column(DateTime(timezone=True), nullable=True)
+    stripe_subscription_id = Column(String, nullable=True, unique=True)
+    stripe_customer_id = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    user = relationship("User", back_populates="subscription")
+
+class BillingHistory(Base):
+    __tablename__ = "billing_histories"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    amount = Column(Integer, nullable=False) # In cents
+    currency = Column(String, default="usd")
+    status = Column(String, nullable=False) # "paid", "failed", "pending"
+    plan_name = Column(String, nullable=False)
+    billing_cycle = Column(String, nullable=False)
+    invoice_pdf = Column(String, nullable=True)
+    stripe_invoice_id = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="billing_histories")
 
 # Create tables automatically at import
 try:

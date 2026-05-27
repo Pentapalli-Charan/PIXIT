@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Navbar, AuthModal, ProtectedRoute } from './components';
-import { Landing, Workspace, CommunityGallery, UserHistory, UserProfile } from './pages';
+import { Landing, Workspace, CommunityGallery, UserHistory, UserProfile, Pricing, Checkout, PaymentSuccess, PaymentFailed } from './pages';
 import { useAuth } from './context/AuthContext';
 
 function App() {
@@ -25,6 +25,22 @@ function App() {
               <Route path="/" element={<Landing />} />
               <Route path="/workspace" element={<Workspace />} />
               <Route path="/gallery" element={<CommunityGallery />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/checkout" element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              } />
+              <Route path="/payment-success" element={
+                <ProtectedRoute>
+                  <PaymentSuccess />
+                </ProtectedRoute>
+              } />
+              <Route path="/payment-failed" element={
+                <ProtectedRoute>
+                  <PaymentFailed />
+                </ProtectedRoute>
+              } />
               <Route path="/history" element={
                 <ProtectedRoute>
                   <UserHistory />

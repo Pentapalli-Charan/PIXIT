@@ -12,3 +12,5 @@ psycopg2-binary
 opencv-python-headless
 numpy
 Pillow
+stripe
+

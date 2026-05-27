@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Shield, CreditCard, LogOut, Check, ArrowLeft, Key } from 'lucide-react';
+import { User, Shield, CreditCard, LogOut, Check, ArrowLeft, Loader, AlertCircle, HelpCircle, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
@@ -12,10 +12,70 @@ const UserProfile = () => {
   const [marketingEmail, setMarketingEmail] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
 
+  // Subscription state
+  const [subData, setSubData] = useState(null);
+  const [billingHistory, setBillingHistory] = useState([]);
+  const [loadingSub, setLoadingSub] = useState(true);
+  const [canceling, setCanceling] = useState(false);
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      if (!user) return;
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/payment/subscription`, {
+          headers: {
+            'Authorization': `Bearer ${user.token}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setSubData(data.subscription);
+          setBillingHistory(data.billing_history);
+        }
+      } catch (err) {
+        console.error("Failed to load subscription details:", err);
+      } finally {
+        setLoadingSub(false);
+      }
+    };
+    
+    fetchSubscription();
+  }, [user]);
+
   const handleSaveSettings = (e) => {
     e.preventDefault();
     setSuccessMsg("Settings updated successfully!");
     setTimeout(() => setSuccessMsg(null), 3000);
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!window.confirm("Are you sure you want to cancel your premium subscription? You will retain access until the end of your current cycle.")) return;
+    setCanceling(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/payment/cancel`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
+      });
+      if (response.ok) {
+        setSuccessMsg("Your premium subscription has been canceled.");
+        // Refresh
+        const refreshResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/payment/subscription`, {
+          headers: {
+            'Authorization': `Bearer ${user.token}`
+          }
+        });
+        if (refreshResponse.ok) {
+          const data = await refreshResponse.json();
+          setSubData(data.subscription);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCanceling(false);
+    }
   };
 
   const handleLogout = () => {
@@ -38,6 +98,12 @@ const UserProfile = () => {
       </div>
     );
   }
+
+  // Quota usage simulation
+  const isPremium = subData && subData.plan_name !== 'Free';
+  const stylizationsUsed = isPremium ? 142 : 12;
+  const stylizationsLimit = isPremium ? 'Unlimited' : 15;
+  const resolutionLimit = isPremium ? (subData.plan_name === 'Enterprise' ? 'Lossless RAW' : '4K UHD') : '1080p';
 
   return (
     <div className="py-8 w-full max-w-4xl mx-auto px-4 text-white">
@@ -62,14 +128,44 @@ const UserProfile = () => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
         {/* Navigation Tabs (Sidebar style) */}
-        <div className="md:col-span-1 flex flex-col gap-3">
+        <div className="md:col-span-1 flex flex-col gap-4">
           <div className="bg-[#111115]/80 border border-slate-800 rounded-2xl p-5 text-center flex flex-col items-center">
             <div className="w-16 h-16 bg-slate-900 border border-white/10 rounded-full flex items-center justify-center text-2xl font-black text-[var(--pixit-primary)] mb-4 uppercase">
               {user.username[0]}
             </div>
             <h3 className="font-extrabold text-sm text-white">{user.username}</h3>
-            <span className="text-gray-500 text-xs mt-0.5 uppercase tracking-wider font-semibold">Creator Account</span>
+            <span className="text-gray-500 text-xs mt-0.5 uppercase tracking-wider font-semibold">
+              {isPremium ? `${subData?.plan_name} Developer` : 'Creator Account'}
+            </span>
+          </div>
+
+          {/* Simulated Usage Stats Card */}
+          <div className="bg-[#111115]/80 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5 text-[var(--pixit-primary)]" /> AI Quota Usage
+            </h4>
+            
+            {/* Limit 1 */}
+            <div>
+              <div className="flex justify-between text-[11px] font-bold mb-1">
+                <span className="text-gray-400">Stylizations</span>
+                <span>{stylizationsUsed} / {stylizationsLimit}</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-[var(--pixit-primary)]" 
+                  style={{ width: isPremium ? '70%' : `${(stylizationsUsed / 15) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Limit 2 */}
+            <div className="flex justify-between text-[11px] font-bold">
+              <span className="text-gray-400">Resolution Max</span>
+              <span className="text-[var(--pixit-primary)]">{resolutionLimit}</span>
+            </div>
           </div>
 
           <button 
@@ -82,6 +178,7 @@ const UserProfile = () => {
 
         {/* Configurations Forms (Main panel) */}
         <div className="md:col-span-2 flex flex-col gap-6">
+          
           {/* Profile details */}
           <div className="bg-[#111115]/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
             <h2 className="text-sm font-extrabold text-white uppercase tracking-wider mb-6 flex items-center gap-2">
@@ -103,7 +200,7 @@ const UserProfile = () => {
                   <label className="block text-gray-500 text-xs font-bold mb-1.5 uppercase">Plan Status</label>
                   <input 
                     type="text" 
-                    value="Free Canvas Starter" 
+                    value={loadingSub ? 'Loading...' : `${subData?.plan_name || 'Free'} Tier`} 
                     disabled 
                     className="w-full bg-[var(--pixit-primary)]/5 border border-[var(--pixit-primary)]/10 rounded-lg p-2.5 text-[var(--pixit-primary)] text-xs font-bold cursor-not-allowed"
                   />
@@ -120,28 +217,6 @@ const UserProfile = () => {
                 />
               </div>
 
-              {/* Checkboxes */}
-              <div className="pt-4 border-t border-white/5 space-y-3">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={emailNotification}
-                    onChange={(e) => setEmailNotification(e.target.checked)}
-                    className="rounded border-slate-800 text-[var(--pixit-primary)] focus:ring-[var(--pixit-primary)]"
-                  />
-                  <span className="text-gray-300 text-xs font-semibold">Notify me about processing updates and server status.</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={marketingEmail}
-                    onChange={(e) => setMarketingEmail(e.target.checked)}
-                    className="rounded border-slate-800 text-[var(--pixit-primary)] focus:ring-[var(--pixit-primary)]"
-                  />
-                  <span className="text-gray-300 text-xs font-semibold">Receive emails on trending styles and gallery highlights.</span>
-                </label>
-              </div>
-
               <div className="pt-4 flex justify-end">
                 <button 
                   type="submit"
@@ -153,24 +228,100 @@ const UserProfile = () => {
             </form>
           </div>
 
-          {/* Billing Plan upgrade mockup */}
-          <div className="bg-[#111115]/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
-            <h2 className="text-sm font-extrabold text-white uppercase tracking-wider mb-6 flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-[var(--pixit-primary)]" /> Subscription Tiers
+          {/* Billing Plan panel */}
+          <div className="bg-[#111115]/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+            <h2 className="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-[var(--pixit-primary)]" /> Subscription & Invoicing
             </h2>
-            <div className="p-4 rounded-xl border border-[var(--pixit-primary)]/20 bg-[var(--pixit-primary)]/5 flex items-center justify-between">
-              <div>
-                <div className="font-extrabold text-sm text-white">Free Starter Tier</div>
-                <p className="text-gray-400 text-xs mt-0.5 leading-relaxed">You are currently using the free model playground. Limits: 5 saved projects maximum.</p>
+
+            {loadingSub ? (
+              <div className="flex items-center justify-center py-6">
+                <Loader className="w-6 h-6 text-[var(--pixit-primary)] animate-spin" />
               </div>
-              <button 
-                onClick={() => navigate('/')}
-                className="bg-[var(--pixit-primary)] text-black font-black text-[10px] uppercase px-4 py-2 rounded-lg hover:shadow-[0_0_10px_var(--pixit-primary)] transition cursor-pointer"
-              >
-                Upgrade to Pro
-              </button>
-            </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="p-4 rounded-xl border border-[var(--pixit-primary)]/20 bg-[var(--pixit-primary)]/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <div className="font-extrabold text-sm text-white">
+                      {subData?.plan_name || 'Free'} Tier {subData?.status === 'canceled' && <span className="text-red-400 text-[10px] font-black uppercase">(Cancelled)</span>}
+                    </div>
+                    <p className="text-gray-400 text-xs mt-0.5 leading-relaxed">
+                      {subData?.plan_name === 'Free' 
+                        ? 'Unlock high-fidelity 4K output, model training, and priority rendering speeds by upgrading.'
+                        : `Your plan is currently ${subData?.status}. Billing cycle: ${subData?.billing_cycle}.`
+                      }
+                    </p>
+                    {subData?.current_period_end && (
+                      <p className="text-[var(--pixit-primary)] text-[10px] font-bold mt-1">
+                        {subData?.status === 'canceled' ? 'Expires' : 'Renews'} on: {new Date(subData.current_period_end).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="shrink-0">
+                    {subData?.plan_name === 'Free' ? (
+                      <button 
+                        onClick={() => navigate('/pricing')}
+                        className="w-full sm:w-auto bg-[var(--pixit-primary)] text-black font-black text-xs uppercase px-5 py-2.5 rounded-xl hover:shadow-[0_0_15px_var(--pixit-primary)] transition cursor-pointer"
+                      >
+                        Upgrade Plan
+                      </button>
+                    ) : (
+                      subData?.status !== 'canceled' && (
+                        <button 
+                          onClick={handleCancelSubscription}
+                          disabled={canceling}
+                          className="w-full sm:w-auto bg-transparent border border-red-500/30 hover:border-red-500 text-red-400 hover:text-red-500 font-extrabold text-xs uppercase px-4 py-2.5 rounded-xl transition cursor-pointer"
+                        >
+                          {canceling ? 'Cancelling...' : 'Cancel Subscription'}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+
+                {/* Billing History logs */}
+                {billingHistory.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-xs font-extrabold uppercase tracking-wide text-gray-400">Billing Transactions</h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-[11px] font-semibold border-collapse">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-gray-500">
+                            <th className="py-2.5">Date</th>
+                            <th className="py-2.5">Plan</th>
+                            <th className="py-2.5">Amount</th>
+                            <th className="py-2.5">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5 text-gray-300">
+                          {billingHistory.map((item, idx) => (
+                            <tr key={idx}>
+                              <td className="py-2.5">
+                                {new Date(item.created_at).toLocaleDateString(undefined, {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </td>
+                              <td className="py-2.5 uppercase">{item.plan_name} ({item.billing_cycle})</td>
+                              <td className="py-2.5">${(item.amount / 100).toFixed(2)}</td>
+                              <td className="py-2.5">
+                                <span className="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-black text-[9px] uppercase">
+                                  {item.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+
         </div>
       </div>
     </div>

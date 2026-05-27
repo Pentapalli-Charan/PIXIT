@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from api.routes import auth, upload, health
+from api.routes import auth, upload, health, payment
 from core.config import settings
 from core.database import verify_db_connection
 
@@ -74,6 +74,7 @@ app.mount("/static", StaticFiles(directory="uploads"), name="static")
 app.include_router(health.router, prefix="/health", tags=["health"])
 app.include_router(auth.router, tags=["auth"])
 app.include_router(upload.router, prefix="/upload", tags=["upload"])
+app.include_router(payment.router, prefix="/payment", tags=["payment"])
 
 import socket
 instance_name = os.environ.get("INSTANCE_NAME", socket.gethostname())
