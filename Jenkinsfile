@@ -34,11 +34,11 @@ pipeline {
                 
                 // Install frontend dependencies via a node container (since they are not pre-installed on Jenkins host)
                 echo '[INFO] Restoring Node package modules...'
-                sh 'docker run --rm -v "${WORKSPACE}":/app -w /app/frontend node:20-alpine npm ci'
+                sh 'docker run --rm --volumes-from $(hostname) -w "${WORKSPACE}/frontend" node:20-alpine npm ci'
                 
                 // Setup Python virtual environment and dependencies
                 echo '[INFO] Restoring Python package modules...'
-                sh 'docker run --rm -v "${WORKSPACE}":/app -w /app/fastapi_backend python:3.11-slim sh -c "python -m venv venv && ./venv/bin/pip install -r requirements.txt"'
+                sh 'docker run --rm --volumes-from $(hostname) -w "${WORKSPACE}/fastapi_backend" python:3.11-slim sh -c "python -m venv venv && ./venv/bin/pip install -r requirements.txt"'
             }
         }
 
@@ -49,11 +49,11 @@ pipeline {
                 
                 // Run frontend ESLint check
                 echo '[INFO] Validating frontend source formats (ESLint)...'
-                sh 'docker run --rm -v "${WORKSPACE}":/app -w /app/frontend node:20-alpine npm run lint || echo "[WARNING] ESLint formatting violations detected, continuing..."'
+                sh 'docker run --rm --volumes-from $(hostname) -w "${WORKSPACE}/frontend" node:20-alpine npm run lint || echo "[WARNING] ESLint formatting violations detected, continuing..."'
                 
                 // Run backend tests inside a python container using the virtualenv
                 echo '[INFO] Validating backend unit test logic...'
-                sh 'docker run --rm -v "${WORKSPACE}":/app -w /app/fastapi_backend python:3.11-slim ./venv/bin/python test_app.py'
+                sh 'docker run --rm --volumes-from $(hostname) -w "${WORKSPACE}/fastapi_backend" python:3.11-slim ./venv/bin/python test_app.py'
             }
         }
 
@@ -116,11 +116,11 @@ pipeline {
                 sh '''
                 if [ -f .kube/config ]; then
                     echo "[INFO] Running Kubernetes updates (kubectl apply)..."
-                    docker run --rm --add-host=host.docker.internal:host-gateway -v "${WORKSPACE}":/app -w /app bitnami/kubectl:latest --kubeconfig=/app/.kube/config --insecure-skip-tls-verify apply -f kubernetes/ -n pixit || true
+                    docker run --rm --add-host=host.docker.internal:host-gateway --volumes-from $(hostname) -w "${WORKSPACE}" bitnami/kubectl:latest --kubeconfig="${WORKSPACE}/.kube/config" --insecure-skip-tls-verify apply -f kubernetes/ -n pixit || true
                     
                     echo "[INFO] Rolling out fresh deployment pods..."
-                    docker run --rm --add-host=host.docker.internal:host-gateway -v "${WORKSPACE}":/app -w /app bitnami/kubectl:latest --kubeconfig=/app/.kube/config --insecure-skip-tls-verify rollout restart deployment/backend -n pixit || true
-                    docker run --rm --add-host=host.docker.internal:host-gateway -v "${WORKSPACE}":/app -w /app bitnami/kubectl:latest --kubeconfig=/app/.kube/config --insecure-skip-tls-verify rollout restart deployment/frontend -n pixit || true
+                    docker run --rm --add-host=host.docker.internal:host-gateway --volumes-from $(hostname) -w "${WORKSPACE}" bitnami/kubectl:latest --kubeconfig="${WORKSPACE}/.kube/config" --insecure-skip-tls-verify rollout restart deployment/backend -n pixit || true
+                    docker run --rm --add-host=host.docker.internal:host-gateway --volumes-from $(hostname) -w "${WORKSPACE}" bitnami/kubectl:latest --kubeconfig="${WORKSPACE}/.kube/config" --insecure-skip-tls-verify rollout restart deployment/frontend -n pixit || true
                 else
                     echo "[WARNING] Kubeconfig not available inside container. Skipping Kubernetes deploy step."
                 fi
