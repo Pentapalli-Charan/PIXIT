@@ -13,4 +13,4 @@ opencv-python-headless
 numpy
 Pillow
 stripe
-
+httpx
