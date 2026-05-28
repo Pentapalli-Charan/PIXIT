@@ -53,7 +53,7 @@ pipeline {
                 
                 // Run backend tests inside a python container using the virtualenv
                 echo '[INFO] Validating backend unit test logic...'
-                sh 'docker run --rm --volumes-from $(hostname) -w "${WORKSPACE}/fastapi_backend" python:3.11-slim ./venv/bin/python test_app.py'
+                sh 'docker run --rm --volumes-from $(hostname) -e SQLALCHEMY_DATABASE_URL=sqlite:///./test.db -w "${WORKSPACE}/fastapi_backend" python:3.11-slim ./venv/bin/python test_app.py'
             }
         }
 

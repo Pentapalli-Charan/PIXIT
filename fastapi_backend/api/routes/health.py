@@ -15,7 +15,7 @@ async def health_check(db: Session = Depends(get_db)):
         db_status = f"disconnected: {str(e)}"
 
     return {
-        "status": "online" if db_status == "connected" else "degraded",
+        "status": "healthy" if db_status == "connected" else "degraded",
         "service": "PIXIT API",
         "version": "1.0.0",
         "database": db_status
